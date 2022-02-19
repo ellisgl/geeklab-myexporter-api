@@ -90,7 +90,7 @@ switch ($routeInfo[0]) {
                 // We'll do a middleware the manual way, instead of the PSR-15 way for now, till I find something better.
                 // If the controller class implements the Authentication interface, do an authentication check.
                 if (in_array(AuthenticationInterface::class, class_implements($class), true)) {
-                    $authenticationService->checkAuthenticated($request);
+                    $authenticationService->isAuthenticated($request);
                 }
 
                 // Execute the action method.

@@ -17,7 +17,8 @@
         "geeklab/conf": "^3.1",
         "ext-pdo": "*",
         "firebase/php-jwt": "^6.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "phpunit/phpunit": "^9.5"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest"
