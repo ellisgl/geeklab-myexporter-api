@@ -16,22 +16,30 @@ class AuthenticationService
 {
     private GLConf $config;
 
-    /** @var object | null $token Decoded JWT object. */
+    private PDO $pdo;
+
+    // Decoded JWT object.
     private ?object $token;
 
-    public function __construct(GLConf $conf)
+    public function __construct(GLConf $config)
     {
-        $this->config = $conf;
+        $this->config = $config;
     }
+
+    /**
+     * @param Request $request
+     *
+     * @return string
+     * @throws \JsonException
+     */
 
     public function doAuthentication(Request $request): string
     {
         // Decode the request.
         $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
-
         // Attempt a connection
         $pdo = new PDO(
-            'mysql:host=' . $this->config->get('servers')[(int) $data['host']]['host'] . ';',
+            'mysql:host=' . $this->config->get('servers.' . (int) $data['host'] . '.host') . ';',
             $data['username'],
             $data['password'],
             [PDO::ATTR_PERSISTENT => false]
