@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Core\Controllers;
 
+use App\Authentication\NotLoggedInException;
 use App\Core\BaseController;
+use \Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -43,5 +45,20 @@ class ErrorController extends BaseController
         $this->response->setContent('405 - Method not allowed');
 
         return $this->response;
+    }
+
+    public function handleError(Exception $e): JsonResponse
+    {
+        // Detect HTTP error exceptions and return the correct response.
+        // Will need to use better class names and more classes.
+        switch (get_class($e)) {
+            case NotLoggedInException::class:
+                return $this->error401();
+            default:
+                $this->response->setStatusCode(JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+                $this->response->setContent('500 - Internal server error');
+
+                return $this->response;
+        }
     }
 }

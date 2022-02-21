@@ -6,9 +6,9 @@ namespace App;
 
 use App\Authentication\AuthenticationInterface;
 use App\Authentication\AuthenticationService;
-use App\Authentication\NotLoggedInException;
 use App\Core\Controllers\ErrorController;
 use Auryn\Injector;
+use \Exception;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use GeekLab\Conf\Driver\ArrayConfDriver;
@@ -103,8 +103,9 @@ switch ($routeInfo[0]) {
                 // We have something bad here.
                 $response = $errorController->error405();
             }
-        } catch (NotLoggedInException $e) {
-            $response = $errorController->error401();
+        } catch (Exception $e) {
+            $response = $errorController->handleError($e);
+            // $response = $errorController->error401();
         }
         break;
     case Dispatcher::NOT_FOUND:
