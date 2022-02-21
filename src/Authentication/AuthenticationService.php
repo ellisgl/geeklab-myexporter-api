@@ -8,7 +8,7 @@ use \DateTimeImmutable;
 use \Exception;
 use Firebase\JWT\Key;
 use GeekLab\Conf\GLConf;
-use PDO;
+use \PDO;
 use Symfony\Component\HttpFoundation\Request;
 use Firebase\JWT\JWT;
 
