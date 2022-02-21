@@ -3,13 +3,14 @@
 namespace unit\Authentication;
 
 use App\Authentication\AuthenticationService;
+use App\Core\DbService;
 use Firebase\JWT\JWT;
 use GeekLab\Conf\Driver\ArrayConfDriver;
 use GeekLab\Conf\GLConf;
+use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
+use PDO;
 use Symfony\Component\HttpFoundation\Request;
-
-include __DIR__ . '/../../helpers/PDOStub.php';
 
 class AuthenticationServiceTest extends MockeryTestCase
 {
@@ -25,8 +26,9 @@ class AuthenticationServiceTest extends MockeryTestCase
         $confDir = __DIR__ . '/../../_data/conf/';
         $this->config = new GLConf(new ArrayConfDriver($confDir . 'config.php', $confDir));
         $this->config->init();
-
-        $this->authenticationService = new AuthenticationService($this->config);
+        $dbServiceMock = Mockery::mock(DbService::class.'[createPDO]');
+        $dbServiceMock->shouldReceive('createPDO')->once()->andReturns(Mockery::mock(PDO::class));
+        $this->authenticationService = new AuthenticationService($this->config, $dbServiceMock);
     }
 
     /**
@@ -35,8 +37,17 @@ class AuthenticationServiceTest extends MockeryTestCase
      */
     public function testDoAuthentication(): void
     {
-        // I can't mock PDO at this time, so I can't test this method.
-        // I might have to do some weird injection and init, then mock the injection and return a mock...
+        $request = new Request(
+            [],
+            [],
+            [],
+            [],
+            [],
+            ['CONTENT-TYPE' => 'application/json'],
+            '{"host": 0, "username": "test", "password": "password"}'
+        );
+        $response = $this->authenticationService->doAuthentication($request);
+        var_dump($response);
         $this->assertTrue(true);
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Authentication;
 
+use App\Core\DbService;
 use \DateTimeImmutable;
 use \Exception;
 use Firebase\JWT\Key;
@@ -16,14 +17,15 @@ class AuthenticationService
 {
     private GLConf $config;
 
-    private PDO $pdo;
+    private DbService $dbService;
 
     // Decoded JWT object.
     private ?object $token;
 
-    public function __construct(GLConf $config)
+    public function __construct(GLConf $config, DbService $dbService)
     {
         $this->config = $config;
+        $this->dbService = $dbService;
     }
 
     /**
@@ -38,13 +40,11 @@ class AuthenticationService
         // Decode the request.
         $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
         // Attempt a connection
-        $pdo = new PDO(
-            'mysql:host=' . $this->config->get('servers.' . (int) $data['host'] . '.host') . ';',
+        $this->dbService->createPDO(
+            $this->config->get('servers.' . (int) $data['host'] . '.host'),
             $data['username'],
-            $data['password'],
-            [PDO::ATTR_PERSISTENT => false]
+            $data['password']
         );
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         // Create a JWT token and return it.
         $iat = time();
@@ -56,7 +56,7 @@ class AuthenticationService
                 'nbf'  => $iat,
                 'exp'  => $iat + 86400,
                 'data' => [
-                    'dbh' => $this->config->get('servers')[(int) $data['host']]['host'],
+                    'dbh' => $this->config->get('servers.' . (int) $data['host'] . '.host'),
                     'dbu' => $data['username'],
                     'dbp' => $data['password'],
                 ]
