@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace App\Authentication;
 
 use App\Core\BaseController;
-use Firebase\JWT\JWT;
 use \JsonException;
-use \PDO;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Symfony\Component\HttpFoundation\Request;
+use App\Core\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AuthenticationController extends BaseController
@@ -35,16 +33,5 @@ class AuthenticationController extends BaseController
         $this->response->setStatusCode(JsonResponse::HTTP_OK);
 
         return $this->response;
-    }
-
-    /**
-     * Log the current user out.
-     *
-     * @return JsonResponse
-     */
-    public function logout(): JsonResponse
-    {
-        // Clear JWT.
-        return new JsonResponse([]);
     }
 }

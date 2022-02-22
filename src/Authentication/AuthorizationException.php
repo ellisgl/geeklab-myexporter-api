@@ -6,7 +6,7 @@ namespace App\Authentication;
 
 use Exception;
 
-class NotLoggedInException extends Exception
+class AuthorizationException extends Exception
 {
     public function __construct($message, $code = 0, Exception $previous = null)
     {

@@ -33,9 +33,6 @@ class DbController extends BaseController implements AuthenticationInterface
      * @Todo: Move logic to service or something.
      *
      * @return JsonResponse
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
      */
     public function index(): JsonResponse
     {

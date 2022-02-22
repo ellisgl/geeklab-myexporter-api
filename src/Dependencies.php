@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 use App\Authentication\AuthenticationService;
 use Auryn\Injector;
-use Symfony\Component\HttpFoundation\Request;
+use App\Core\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 // Create the injector.
 $injector = new Injector();

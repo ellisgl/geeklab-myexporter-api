@@ -9,9 +9,9 @@ use \DateTimeImmutable;
 use \Exception;
 use Firebase\JWT\Key;
 use GeekLab\Conf\GLConf;
-use \PDO;
-use Symfony\Component\HttpFoundation\Request;
+use App\Core\Request;
 use Firebase\JWT\JWT;
+use \JsonException;
 
 class AuthenticationService
 {
@@ -32,13 +32,14 @@ class AuthenticationService
      * @param Request $request
      *
      * @return string
-     * @throws \JsonException
+     * @throws JsonException
      */
 
     public function doAuthentication(Request $request): string
     {
         // Decode the request.
-        $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $data = $request->getJsonContentAsArray();
+
         // Attempt a connection
         $this->dbService->createPDO(
             $this->config->get('servers.' . (int) $data['host'] . '.host'),
@@ -67,26 +68,26 @@ class AuthenticationService
     }
 
     /**
-     * @throws NotLoggedInException
+     * @throws AuthorizationException
      */
     public function isAuthenticated(Request $request): void
     {
         // Get the BEARER AUTH JWT.
         $jwt = explode(' ', $request->server->get('HTTP_AUTHORIZATION'))[1];
         if (!$jwt) {
-            throw new NotLoggedInException('NOT LOGGED IN');
+            throw new AuthorizationException('NOT LOGGED IN');
         }
 
         try {
             $now = new DateTimeImmutable();
             $token = JWT::decode($jwt, new Key($this->config->get('jwt.secret_key'), $this->config->get('jwt.alg')));
             if ($token->nbf > $now->getTimestamp() || $token->exp < $now->getTimestamp()) {
-                throw new NotLoggedInException('NOT LOGGED IN');
+                throw new AuthorizationException('NOT LOGGED IN');
             }
 
             $this->token = $token;
         } catch (Exception $e) {
-            throw new NotLoggedInException('NOT LOGGED IN');
+            throw new AuthorizationException('NOT LOGGED IN');
         }
     }
 

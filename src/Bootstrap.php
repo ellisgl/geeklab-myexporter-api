@@ -7,6 +7,7 @@ namespace App;
 use App\Authentication\AuthenticationInterface;
 use App\Authentication\AuthenticationService;
 use App\Core\Controllers\ErrorController;
+use App\Core\DbService;
 use Auryn\Injector;
 use \Exception;
 use FastRoute\Dispatcher;
@@ -14,7 +15,7 @@ use FastRoute\RouteCollector;
 use GeekLab\Conf\Driver\ArrayConfDriver;
 use GeekLab\Conf\GLConf;
 use \PDO;
-use Symfony\Component\HttpFoundation\Request;
+use App\Core\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use function FastRoute\simpleDispatcher;
@@ -32,6 +33,9 @@ $config = new GLConf(
 $config->init();
 $environment = $config->get('env');
 
+// Create the DbService object.
+$dbService = new DbService();
+
 // Configure and init dependency injection.
 /** @var Injector $injector */
 $injector = include('Dependencies.php');
@@ -40,6 +44,9 @@ $request = $injector->make(Request::class);
 
 // Share the configuration with the rest of the system.
 $injector->share($config);
+
+// Share the dbService.
+$injector->share($dbService);
 
 // Make sure we have authentication system created.
 /** @var AuthenticationService $authenticationService */
@@ -105,7 +112,6 @@ switch ($routeInfo[0]) {
             }
         } catch (Exception $e) {
             $response = $errorController->handleError($e);
-            // $response = $errorController->error401();
         }
         break;
     case Dispatcher::NOT_FOUND:

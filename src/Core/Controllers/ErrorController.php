@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core\Controllers;
 
-use App\Authentication\NotLoggedInException;
+use App\Authentication\AuthorizationException;
 use App\Core\BaseController;
 use \Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -52,7 +52,7 @@ class ErrorController extends BaseController
         // Detect HTTP error exceptions and return the correct response.
         // Will need to use better class names and more classes.
         switch (get_class($e)) {
-            case NotLoggedInException::class:
+            case AuthorizationException::class:
                 return $this->error401();
             default:
                 $this->response->setStatusCode(JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
