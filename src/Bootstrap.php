@@ -6,7 +6,7 @@ namespace App;
 
 use App\Authentication\AuthenticationInterface;
 use App\Authentication\AuthenticationService;
-use App\Core\Controllers\ErrorController;
+use App\Core\Exceptions\Http\ErrorService;
 use App\Core\Request;
 use App\Database\DatabaseService;
 use Auryn\Injector;
@@ -78,13 +78,13 @@ $dispatcher = simpleDispatcher($routeDefinitionCallback);
 $routeInfo = $dispatcher->dispatch($request->getMethod(), $request->getPathInfo());
 
 // Add in some extra case handling and execute the route endpoint.
-$errorController = $injector->make(ErrorController::class);
+$errorService = $injector->make(ErrorService::class);
 
 // @Todo Wrap in try-catch to deal with HTTP error codes.
 /** @var JsonResponse $response */
 switch ($routeInfo[0]) {
     case Dispatcher::METHOD_NOT_ALLOWED:
-        $response = $errorController->error405();
+        $response = $errorService->error405();
         break;
     case Dispatcher::FOUND:
         try {
@@ -108,15 +108,15 @@ switch ($routeInfo[0]) {
                 $response->setContent($injector->execute($routeInfo[1]));
             } else {
                 // We have something bad here.
-                $response = $errorController->error405();
+                $response = $errorService->error405();
             }
         } catch (Exception $e) {
-            $response = $errorController->handleError($e);
+            $response = $errorService->handleError($e);
         }
         break;
     case Dispatcher::NOT_FOUND:
     default:
-        $response = $errorController->error404();
+        $response = $errorService->error404();
         break;
 }
 
