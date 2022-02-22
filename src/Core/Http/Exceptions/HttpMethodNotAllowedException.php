@@ -9,7 +9,7 @@ use Exception;
 /**
  * HTTP Error 405
  */
-class MethodNotAllowedException extends Exception
+class HttpMethodNotAllowedException extends Exception
 {
     public function __construct($message, $code = 0, Exception $previous = null)
     {

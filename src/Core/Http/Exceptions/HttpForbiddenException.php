@@ -7,9 +7,9 @@ namespace App\Core\Http\Exceptions;
 use Exception;
 
 /**
- * HTTP Error 404
+ * HTTP Error 403
  */
-class NotFoundException extends Exception
+class HttpForbiddenException extends Exception
 {
     public function __construct($message, $code = 0, Exception $previous = null)
     {

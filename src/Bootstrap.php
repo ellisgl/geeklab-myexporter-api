@@ -6,7 +6,7 @@ namespace App;
 
 use App\Authentication\AuthenticationInterface;
 use App\Authentication\AuthenticationService;
-use App\Core\Http\ErrorService;
+use App\Core\Http\HttpErrorService;
 use App\Core\Request;
 use App\Database\DatabaseService;
 use Auryn\Injector;
@@ -78,7 +78,7 @@ $dispatcher = simpleDispatcher($routeDefinitionCallback);
 $routeInfo = $dispatcher->dispatch($request->getMethod(), $request->getPathInfo());
 
 // Add in some extra case handling and execute the route endpoint.
-$errorService = $injector->make(ErrorService::class);
+$errorService = $injector->make(HttpErrorService::class);
 
 // @Todo Wrap in try-catch to deal with HTTP error codes.
 /** @var JsonResponse $response */

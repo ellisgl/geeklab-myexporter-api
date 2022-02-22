@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Authentication;
 
+use App\Core\Http\Exceptions\HttpUnauthorizedException;
 use App\Core\Request;
 use App\Database\DatabaseService;
 use DateTimeImmutable;
@@ -68,26 +69,26 @@ class AuthenticationService
     }
 
     /**
-     * @throws AuthorizationException
+     * @throws HttpUnauthorizedException
      */
     public function isAuthenticated(Request $request): void
     {
         // Get the BEARER AUTH JWT.
         $jwt = explode(' ', $request->server->get('HTTP_AUTHORIZATION'))[1];
         if (!$jwt) {
-            throw new AuthorizationException('NOT LOGGED IN');
+            throw new HttpUnauthorizedException('NOT LOGGED IN');
         }
 
         try {
             $now = new DateTimeImmutable();
             $token = JWT::decode($jwt, new Key($this->config->get('jwt.secret_key'), $this->config->get('jwt.alg')));
             if ($token->nbf > $now->getTimestamp() || $token->exp < $now->getTimestamp()) {
-                throw new AuthorizationException('NOT LOGGED IN');
+                throw new HttpUnauthorizedException('NOT LOGGED IN');
             }
 
             $this->token = $token;
         } catch (Exception $e) {
-            throw new AuthorizationException('NOT LOGGED IN');
+            throw new HttpUnauthorizedException('NOT LOGGED IN');
         }
     }
 

@@ -4,19 +4,37 @@ declare(strict_types=1);
 
 namespace App\Core\Http;
 
-use App\Authentication\AuthorizationException;
-use App\Core\Http\Exceptions\MethodNotAllowedException;
-use App\Core\Http\Exceptions\NotFoundException;
-use Exception;
+use App\Core\Http\Exceptions\HttpForbiddenException;
+use App\Core\Http\Exceptions\HttpUnauthorizedException;
+use App\Core\Http\Exceptions\HttpBadRequestException;
+use App\Core\Http\Exceptions\HttpMethodNotAllowedException;
+use App\Core\Http\Exceptions\HttpNotFoundException;
+use \Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * This is for handling HTTP errors.
  */
-class ErrorService
+class HttpErrorService
 {
     // @Todo: Methods for logging?
     // @Todo: More HTTP error code handling.
+    /**
+     * Return an HTTP 400 BAD REQUEST response
+     *
+     * @param string | null $message
+     *
+     * @return JsonResponse
+     */
+    public function error400(?string $message = null): JsonResponse
+    {
+        $response = new JsonResponse();
+        $response->setStatusCode(JsonResponse::HTTP_BAD_REQUEST);
+        $response->setContent($message ?: '400 - Bad request');
+
+        return $response;
+    }
+
     /**
      * Return an HTTP 401 UNAUTHORIZED response.
      *
@@ -29,6 +47,22 @@ class ErrorService
         $response = new JsonResponse();
         $response->setStatusCode(JsonResponse::HTTP_UNAUTHORIZED);
         $response->setContent($message ?: '401 - Unauthorized');
+
+        return $response;
+    }
+
+    /**
+     * Return an HTTP 403 FORBIDDEN response.
+     *
+     * @param string | null $message
+     *
+     * @return JsonResponse
+     */
+    public function error403(?string $message = null): JsonResponse
+    {
+        $response = new JsonResponse();
+        $response->setStatusCode(JsonResponse::HTTP_FORBIDDEN);
+        $response->setContent($message ?: '403 - Forbidden');
 
         return $response;
     }
@@ -86,11 +120,15 @@ class ErrorService
         // Detect HTTP error exceptions and return the correct response.
         // Will need to use better class names and more classes.
         switch (get_class($e)) {
-            case AuthorizationException::class:
+            case HttpBadRequestException::class:
+                return $this->error400($e->getMessage() ?: null);
+            case HttpUnauthorizedException::class:
                 return $this->error401($e->getMessage() ?: null);
-            case NotFoundException::class:
+            case HttpForbiddenException::class:
+                return $this->error403($e->getMessage() ?: null);
+            case HttpNotFoundException::class:
                 return $this->error404($e->getMessage() ?: null);
-            case MethodNotAllowedException::class:
+            case HttpMethodNotAllowedException::class:
                 return $this->error405($e->getMessage() ?: null);
             default:
                 // I don't think we want the exception message to get out to the wild, do we?
