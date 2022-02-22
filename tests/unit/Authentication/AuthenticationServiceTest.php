@@ -9,8 +9,8 @@ use GeekLab\Conf\Driver\ArrayConfDriver;
 use GeekLab\Conf\GLConf;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use PDO;
-use Symfony\Component\HttpFoundation\Request;
+use \PDO;
+use App\Core\Request;
 
 class AuthenticationServiceTest extends MockeryTestCase
 {
@@ -47,8 +47,8 @@ class AuthenticationServiceTest extends MockeryTestCase
             '{"host": 0, "username": "test", "password": "password"}'
         );
         $response = $this->authenticationService->doAuthentication($request);
-        var_dump($response);
-        $this->assertTrue(true);
+        $this->assertIsString($response);
+        $this->assertNotEmpty($response);
     }
 
     public function testIsAuthenticated(): void
