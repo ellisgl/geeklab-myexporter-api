@@ -7,7 +7,6 @@ namespace App\Core;
 use App\Authentication\AuthenticationService;
 use GeekLab\Conf\GLConf;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Core\Request;
 
 class BaseController
 {

@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace App\Authentication;
 
-use App\Core\DbService;
-use \DateTimeImmutable;
-use \Exception;
+use App\Core\Request;
+use App\Database\DatabaseService;
+use DateTimeImmutable;
+use Exception;
+use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use GeekLab\Conf\GLConf;
-use App\Core\Request;
-use Firebase\JWT\JWT;
-use \JsonException;
+use JsonException;
 
 class AuthenticationService
 {
     private GLConf $config;
 
-    private DbService $dbService;
+    private DatabaseService $dbService;
 
     // Decoded JWT object.
     private ?object $token;
 
-    public function __construct(GLConf $config, DbService $dbService)
+    public function __construct(GLConf $config, DatabaseService $dbService)
     {
         $this->config = $config;
         $this->dbService = $dbService;

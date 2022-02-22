@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Controllers;
+namespace App\Database;
 
 use App\Authentication\AuthenticationInterface;
 use App\Core\BaseController;
@@ -12,8 +12,7 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-
-class DbController extends BaseController implements AuthenticationInterface
+class DatabaseController extends BaseController implements AuthenticationInterface
 {
     private PDO $pdo;
 

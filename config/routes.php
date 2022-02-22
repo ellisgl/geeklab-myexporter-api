@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-use App\Controllers\DbController;
 use App\Authentication\AuthenticationController;
+use App\Database\DatabaseController;
 
 return [
     'routes' => [
         [
             'methods' => ['GET'],
             'path'    => '/db',
-            'handler' => [DbController::class, 'index']
+            'handler' => [DatabaseController::class, 'index']
         ],
         [
           'methods' => ['GET'],
           'path' => '/db/{database}',
-          'handler' => [DbController::class, 'getTables']
+          'handler' => [DatabaseController::class, 'getTables']
         ],
         [
             'methods' => ['GET'],

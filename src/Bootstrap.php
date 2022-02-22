@@ -7,15 +7,15 @@ namespace App;
 use App\Authentication\AuthenticationInterface;
 use App\Authentication\AuthenticationService;
 use App\Core\Controllers\ErrorController;
-use App\Core\DbService;
+use App\Core\Request;
+use App\Database\DatabaseService;
 use Auryn\Injector;
-use \Exception;
+use Exception;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use GeekLab\Conf\Driver\ArrayConfDriver;
 use GeekLab\Conf\GLConf;
-use \PDO;
-use App\Core\Request;
+use PDO;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use function FastRoute\simpleDispatcher;
@@ -33,8 +33,8 @@ $config = new GLConf(
 $config->init();
 $environment = $config->get('env');
 
-// Create the DbService object.
-$dbService = new DbService();
+// Create the DatabaseService object.
+$dbService = new DatabaseService();
 
 // Configure and init dependency injection.
 /** @var Injector $injector */

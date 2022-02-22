@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Core;
+namespace App\Database;
 
-use \PDO;
+use PDO;
 
-class DbService
+class DatabaseService
 {
     /**
      * @param string $host
