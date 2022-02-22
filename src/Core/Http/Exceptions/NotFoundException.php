@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Exceptions\Http;
+namespace App\Core\Http\Exceptions;
 
-use \Exception;
+use Exception;
 
 /**
- * HTTP Error 405
+ * HTTP Error 404
  */
-class MethodNotAllowedException extends Exception
+class NotFoundException extends Exception
 {
     public function __construct($message, $code = 0, Exception $previous = null)
     {

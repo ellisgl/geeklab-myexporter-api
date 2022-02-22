@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Exceptions\Http;
+namespace App\Core\Http;
 
 use App\Authentication\AuthorizationException;
-use App\Core\BaseController;
+use App\Core\Http\Exceptions\MethodNotAllowedException;
+use App\Core\Http\Exceptions\NotFoundException;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 

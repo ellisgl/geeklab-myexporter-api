@@ -6,7 +6,7 @@ namespace App;
 
 use App\Authentication\AuthenticationInterface;
 use App\Authentication\AuthenticationService;
-use App\Core\Exceptions\Http\ErrorService;
+use App\Core\Http\ErrorService;
 use App\Core\Request;
 use App\Database\DatabaseService;
 use Auryn\Injector;
