@@ -33,4 +33,11 @@ class HttpErrorServiceTest extends TestCase
         self::assertEquals(JsonResponse::HTTP_BAD_REQUEST, $res->getStatusCode());
         self::assertEquals('Test', $res->getContent());
     }
+
+    public function testError500WithMessage(): void
+    {
+        $res = $this->httpErrorService->error500('Test');
+        self::assertEquals(JsonResponse::HTTP_INTERNAL_SERVER_ERROR, $res->getStatusCode());
+        self::assertEquals('Test', $res->getContent());
+    }
 }
