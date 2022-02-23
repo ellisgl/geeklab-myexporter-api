@@ -80,7 +80,6 @@ $routeInfo = $dispatcher->dispatch($request->getMethod(), $request->getPathInfo(
 // Add in some extra case handling and execute the route endpoint.
 $errorService = $injector->make(HttpErrorService::class);
 
-// @Todo Wrap in try-catch to deal with HTTP error codes.
 /** @var JsonResponse $response */
 switch ($routeInfo[0]) {
     case Dispatcher::METHOD_NOT_ALLOWED:

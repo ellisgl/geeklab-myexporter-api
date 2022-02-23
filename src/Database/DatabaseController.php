@@ -8,7 +8,6 @@ use App\Authentication\AuthenticationInterface;
 use App\Authentication\AuthenticationService;
 use App\Core\BaseController;
 use App\Core\Http\Exceptions\HttpBadRequestException;
-use App\Core\Http\Exceptions\HttpUnauthorizedException;
 use GeekLab\Conf\GLConf;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Core\Request;
@@ -33,7 +32,6 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
      * Return a list of databases, filtered by excluded.
      *
      * @return JsonResponse
-     * @throws HttpUnauthorizedException
      */
     public function getDatabases(): JsonResponse
     {
@@ -61,7 +59,6 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
      *
      * @return JsonResponse
      * @throws HttpBadRequestException
-     * @throws HttpUnauthorizedException
      */
     public function getTables(array $data): JsonResponse
     {
