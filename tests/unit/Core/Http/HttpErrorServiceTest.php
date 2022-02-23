@@ -11,6 +11,9 @@ class HttpErrorServiceTest extends TestCase
 {
     private HttpErrorService $httpErrorService;
 
+    /**
+     * @return void
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -34,6 +37,9 @@ class HttpErrorServiceTest extends TestCase
         self::assertEquals('Test', $res->getContent());
     }
 
+    /**
+     * @return void
+     */
     public function testError500WithMessage(): void
     {
         $res = $this->httpErrorService->error500('Test');
