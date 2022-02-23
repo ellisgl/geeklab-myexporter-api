@@ -8,7 +8,7 @@ use App\Authentication\AuthenticationInterface;
 use App\Authentication\AuthenticationService;
 use App\Core\Http\HttpErrorService;
 use App\Core\Request;
-use App\Database\DatabaseService;
+use App\Database\PdoService;
 use Auryn\Injector;
 use Exception;
 use FastRoute\Dispatcher;
@@ -34,7 +34,7 @@ $config->init();
 $environment = $config->get('env');
 
 // Create the DatabaseService object.
-$dbService = new DatabaseService();
+$dbService = new PdoService();
 
 // Configure and init dependency injection.
 /** @var Injector $injector */

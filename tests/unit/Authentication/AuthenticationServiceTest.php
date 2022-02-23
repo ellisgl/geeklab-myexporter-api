@@ -4,7 +4,7 @@ namespace unit\Authentication;
 
 use App\Authentication\AuthenticationService;
 use App\Core\Request;
-use App\Database\DatabaseService;
+use App\Database\PdoService;
 use Firebase\JWT\JWT;
 use GeekLab\Conf\Driver\ArrayConfDriver;
 use GeekLab\Conf\GLConf;
@@ -26,7 +26,7 @@ class AuthenticationServiceTest extends MockeryTestCase
         $confDir = __DIR__ . '/../../_data/conf/';
         $this->config = new GLConf(new ArrayConfDriver($confDir . 'config.php', $confDir));
         $this->config->init();
-        $dbServiceMock = Mockery::mock(DatabaseService::class . '[createPDO]');
+        $dbServiceMock = Mockery::mock(PdoService::class . '[createPDO]');
         $dbServiceMock->shouldReceive('createPDO')->once()->andReturns(Mockery::mock(PDO::class));
         $this->authenticationService = new AuthenticationService($this->config, $dbServiceMock);
     }

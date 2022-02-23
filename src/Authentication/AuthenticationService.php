@@ -6,7 +6,7 @@ namespace App\Authentication;
 
 use App\Core\Http\Exceptions\HttpUnauthorizedException;
 use App\Core\Request;
-use App\Database\DatabaseService;
+use App\Database\PdoService;
 use DateTimeImmutable;
 use Exception;
 use Firebase\JWT\JWT;
@@ -18,12 +18,12 @@ class AuthenticationService
 {
     private GLConf $config;
 
-    private DatabaseService $dbService;
+    private PdoService $dbService;
 
     // Decoded JWT object.
-    private ?object $token;
+    private ?object $token = null;
 
-    public function __construct(GLConf $config, DatabaseService $dbService)
+    public function __construct(GLConf $config, PdoService $dbService)
     {
         $this->config = $config;
         $this->dbService = $dbService;
@@ -58,9 +58,10 @@ class AuthenticationService
                 'nbf'  => $iat,
                 'exp'  => $iat + 86400,
                 'data' => [
-                    'dbh' => $this->config->get('servers.' . (int) $data['host'] . '.host'),
-                    'dbu' => $data['username'],
-                    'dbp' => $data['password'],
+                    'host' => (int) $data['host'],
+                    'dbh'  => $this->config->get('servers.' . (int) $data['host'] . '.host'),
+                    'dbu'  => $data['username'],
+                    'dbp'  => $data['password'],
                 ]
             ],
             $this->config->get('jwt.secret_key'),

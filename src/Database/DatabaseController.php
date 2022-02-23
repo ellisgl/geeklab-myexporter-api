@@ -5,121 +5,73 @@ declare(strict_types=1);
 namespace App\Database;
 
 use App\Authentication\AuthenticationInterface;
+use App\Authentication\AuthenticationService;
 use App\Core\BaseController;
+use App\Core\Http\Exceptions\HttpBadRequestException;
+use App\Core\Http\Exceptions\HttpUnauthorizedException;
 use GeekLab\Conf\GLConf;
-use PDO;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
+use App\Core\Request;
 
 class DatabaseController extends BaseController implements AuthenticationInterface
 {
-    private PDO $pdo;
+    private DatabaseService $databaseService;
 
     public function __construct(
         GLConf $config,
         Request $request,
         JsonResponse $response,
-        PDO $pdo
+        AuthenticationService $authenticationService,
+        DatabaseService $databaseService
     ) {
-        parent::__construct($config, $request, $response);
-        $this->pdo = $pdo;
+        parent::__construct($config, $request, $response, $authenticationService);
+
+        $this->databaseService = $databaseService;
     }
 
     /**
-     * Main page after login.
-     *
-     * @Todo: Move logic to service or something.
+     * Return a list of databases, filtered by excluded.
      *
      * @return JsonResponse
+     * @throws HttpUnauthorizedException
      */
-    public function index(): JsonResponse
+    public function getDatabases(): JsonResponse
     {
-        // $this->checkAuthenticated();
+        $this->authenticationService->isAuthenticated($this->request);
+
         $data = ['databases' => []];
 
-        $excludedTables = $this->getExcludedDatabases();
-        $dbs = $this->getDatabases();
+        /** @var object $jwt */
+        $jwt = $this->authenticationService->getToken();
+        $excludedTables = $this->databaseService->getExcludedDatabases($jwt->data->host);
+        $dbs = $this->databaseService->getDatabases();
         foreach ($dbs as $db) {
             if (!in_array($db, $excludedTables, true)) {
                 $data['databases'][] = $db;
             }
         }
 
-        $this->response->setContent($this->renderer->render('Main', $data));
+        $this->response->setData($data);
 
         return $this->response;
     }
 
     /**
-     * @Todo: Move logic to service or something.
-     *
-     * @return array
-     */
-    public function getDatabases(): array
-    {
-        return array_map(
-            static function ($row) {
-                return $row['Database'];
-            },
-            $this->pdo->query('SHOW DATABASES')->fetchAll(PDO::FETCH_ASSOC)
-        );
-    }
-
-    /**
-     * @Todo: Move logic to service or something.
+     * Return a list of tables in a database.
      *
      * @param array $data
      *
      * @return JsonResponse
+     * @throws HttpBadRequestException
+     * @throws HttpUnauthorizedException
      */
     public function getTables(array $data): JsonResponse
     {
-        // $this->checkAuthenticated();
-        $excludedDatabases = $this->getExcludedDatabases();
-        if (in_array($data['database'], $excludedDatabases, true)) {
-            throw new BadRequestException('Bad Request');
-        }
+        $this->authenticationService->isAuthenticated($this->request);
 
-        $dbs = $this->getDatabases();
-        if (!in_array($data['database'], $dbs, true)) {
-            throw new BadRequestException('Bad Request');
-        }
+        /** @var object $jwt */
+        $jwt = $this->authenticationService->getToken();
 
-        // Select our db.
-        $this->pdo->query("USE `{$data['database']}`")->execute();
-
-        // Get the table info.
-        $stmt = $this->pdo->prepare(
-            "
-            SELECT
-              TABLE_NAME AS `name`,
-              (DATA_LENGTH + INDEX_LENGTH) AS `size`
-            FROM
-              information_schema.TABLES
-            WHERE
-              TABLE_SCHEMA = :database
-        "
-        );
-        $stmt->bindParam(':database', $data['database']);
-        $stmt->execute();
-        $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        return new JsonResponse($res);
+        return new JsonResponse($this->databaseService->getTables($jwt->data->host, $data['database']));
     }
-
-    /**
-     * Get an array of excluded tables.
-     *
-     * @return array
-     * @todo Move to service.
-     */
-    private function getExcludedDatabases(): array
-    {
-        $excludedTables = $this->config->get('servers')[(int) $this->request->request->get(
-            'host'
-        )]['excluded_databases'];
-        return is_array($excludedTables) ? $excludedTables : [];
-    }
-
 }

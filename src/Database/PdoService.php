@@ -6,8 +6,6 @@ use \PDO;
 
 class PdoService
 {
-    private ?PDO $pdo;
-
     /**
      * @param string $host
      * @param string $username
@@ -18,18 +16,14 @@ class PdoService
      */
     public function createPDO(string $host, string $username, string $password, int $port = 3306): PDO
     {
-        if ($this->pdo) {
-            return $this->pdo;
-        }
-
-        $this->pdo = new PDO(
+        $pdo = new PDO(
             "mysql:host=$host;port=$port",
             $username,
             $password,
             [PDO::ATTR_PERSISTENT => false]
         );
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        return $this->pdo;
+        return $pdo;
     }
 }

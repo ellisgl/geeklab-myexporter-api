@@ -2,28 +2,87 @@
 
 namespace App\Database;
 
-use PDO;
+use App\Core\Http\Exceptions\HttpBadRequestException;
+use GeekLab\Conf\GLConf;
+use \PDO;
 
 class DatabaseService
 {
-    /**
-     * @param string $host
-     * @param string $username
-     * @param string $password
-     * @param int    $port
-     *
-     * @return PDO
-     */
-    public function createPDO(string $host, string $username, string $password, int $port = 3306): PDO
-    {
-        $pdo = new PDO(
-            "mysql:host=$host;port=$port",
-            $username,
-            $password,
-            [PDO::ATTR_PERSISTENT => false]
-        );
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    private PDO $pdo;
+    private GLConf $config;
 
-        return $pdo;
+    public function __construct(GLConf $config, PDO $pdo)
+    {
+        $this->pdo = $pdo;
+        $this->config = $config;
+    }
+
+    /**
+     * Get databases listed on the host.
+     *
+     * @return array
+     */
+    public function getDatabases(): array
+    {
+        return array_map(
+            static function ($row) {
+                return $row['Database'];
+            },
+            $this->pdo->query('SHOW DATABASES')->fetchAll(PDO::FETCH_ASSOC)
+        );
+    }
+
+    /**
+     * Get an array of excluded tables.
+     *
+     * @param int $hostIdx
+     *
+     * @return array
+     */
+    public function getExcludedDatabases(int $hostIdx): array
+    {
+        $excludedTables = $this->config->get("servers.$hostIdx.excluded_databases");
+        return is_array($excludedTables) ? $excludedTables : [];
+    }
+
+    /**
+     * Get the tables listed in a DB.
+     * @param int    $hostIdx
+     * @param string $database
+     *
+     * @return array
+     * @throws HttpBadRequestException
+     */
+    public function getTables(int $hostIdx, string $database): array
+    {
+        $excludedDatabases = $this->getExcludedDatabases($hostIdx);
+        if (in_array($database, $excludedDatabases, true)) {
+            throw new HttpBadRequestException('Bad Request');
+        }
+
+        $dbs = $this->getDatabases();
+        if (!in_array($database, $dbs, true)) {
+            throw new HttpBadRequestException('Bad Request');
+        }
+
+        // Select our db.
+        $this->pdo->query("USE `$database`")->execute();
+
+        // Get the table info.
+        $stmt = $this->pdo->prepare(
+            "
+            SELECT
+              TABLE_NAME AS `name`,
+              (DATA_LENGTH + INDEX_LENGTH) AS `size`
+            FROM
+              information_schema.TABLES
+            WHERE
+              TABLE_SCHEMA = :database
+        "
+        );
+        $stmt->bindParam(':database', $data['database']);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

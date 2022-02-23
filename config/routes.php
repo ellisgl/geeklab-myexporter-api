@@ -4,27 +4,28 @@ declare(strict_types=1);
 
 use App\Authentication\AuthenticationController;
 use App\Database\DatabaseController;
+use App\Database\ServerController;
 
 return [
     'routes' => [
         [
             'methods' => ['GET'],
-            'path'    => '/db',
-            'handler' => [DatabaseController::class, 'index']
-        ],
-        [
-          'methods' => ['GET'],
-          'path' => '/db/{database}',
-          'handler' => [DatabaseController::class, 'getTables']
+            'path'    => '/servers',
+            'handler' => [ServerController::class, 'getServers']
         ],
         [
             'methods' => ['GET'],
-            'path'    => '/logout',
-            'handler' => [AuthenticationController::class, 'logout']
+            'path'    => '/databases',
+            'handler' => [DatabaseController::class, 'getDatabases']
         ],
         [
-            'methods' => ['GET', 'POST'],
-            'path'    => '/',
+          'methods' => ['GET'],
+          'path' => '/databases/{database}/tables',
+          'handler' => [DatabaseController::class, 'getTables']
+        ],
+        [
+            'methods' => ['POST'],
+            'path'    => '/login',
             'handler' => [AuthenticationController::class, 'login']
         ],
         // Wildcards need to be at the bottom.
