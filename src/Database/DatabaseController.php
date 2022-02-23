@@ -37,8 +37,6 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
      */
     public function getDatabases(): JsonResponse
     {
-        $this->authenticationService->isAuthenticated($this->request);
-
         $data = ['databases' => []];
 
         /** @var object $jwt */
@@ -67,8 +65,6 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
      */
     public function getTables(array $data): JsonResponse
     {
-        $this->authenticationService->isAuthenticated($this->request);
-
         /** @var object $jwt */
         $jwt = $this->authenticationService->getToken();
 
