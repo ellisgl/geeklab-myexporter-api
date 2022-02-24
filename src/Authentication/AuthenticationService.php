@@ -53,10 +53,11 @@ class AuthenticationService
         return JWT::encode(
             [
                 'iss'  => 'localhost',
-                'aud'  => 'localhost',
+                'aud'  => 'myExporter: '. $this->config->get('servers.' . (int) $data['host'] . '.name'),
                 'iat'  => $iat,
                 'nbf'  => $iat,
                 'exp'  => $iat + 86400,
+                'hash' => sha1($request->getClientIp()),
                 'data' => [
                     'host' => (int) $data['host'],
                     'dbh'  => $this->config->get('servers.' . (int) $data['host'] . '.host'),
@@ -105,7 +106,10 @@ class AuthenticationService
                 try {
                     $now = new DateTimeImmutable();
                     $token = JWT::decode($jwt, new Key($this->config->get('jwt.secret_key'), $this->config->get('jwt.alg')));
-                    $this->token = ($token->nbf > $now->getTimestamp() || $token->exp < $now->getTimestamp()) ? null : $token;
+                    $hash = sha1($request->getClientIp());
+                    $this->token = $token->nbf > $now->getTimestamp() || $token->exp < $now->getTimestamp() || $token->hash !== $hash
+                        ? null
+                        : $token;
                 } catch (Exception $e) {
                     $this->token = null;
                 }
