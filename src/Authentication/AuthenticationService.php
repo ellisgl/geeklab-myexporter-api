@@ -62,6 +62,7 @@ class AuthenticationService
                     'dbh'  => $this->config->get('servers.' . (int) $data['host'] . '.host'),
                     'dbu'  => $data['username'],
                     'dbp'  => $data['password'],
+                    'port' => $this->config->get('servers.' . (int) $data['host'] . '.port') ?: 3306,
                 ]
             ],
             $this->config->get('jwt.secret_key'),
@@ -75,20 +76,7 @@ class AuthenticationService
     public function isAuthenticated(Request $request): void
     {
         // Get the BEARER AUTH JWT.
-        $jwt = explode(' ', $request->server->get('HTTP_AUTHORIZATION'))[1];
-        if (!$jwt) {
-            throw new HttpUnauthorizedException('NOT LOGGED IN');
-        }
-
-        try {
-            $now = new DateTimeImmutable();
-            $token = JWT::decode($jwt, new Key($this->config->get('jwt.secret_key'), $this->config->get('jwt.alg')));
-            if ($token->nbf > $now->getTimestamp() || $token->exp < $now->getTimestamp()) {
-                throw new HttpUnauthorizedException('NOT LOGGED IN');
-            }
-
-            $this->token = $token;
-        } catch (Exception $e) {
+        if (!$this->getTokenFromRequest($request)) {
             throw new HttpUnauthorizedException('NOT LOGGED IN');
         }
     }
@@ -99,6 +87,31 @@ class AuthenticationService
      */
     public function getToken(): ?object
     {
+        return $this->token;
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return object | null
+     */
+    public function getTokenFromRequest(Request $request): ?object
+    {
+        if ($request->server->get('HTTP_AUTHORIZATION')) {
+            $auth = explode(' ', $request->server->get('HTTP_AUTHORIZATION'));
+            if (!empty($auth[1])) {
+                $jwt = $auth[1];
+
+                try {
+                    $now = new DateTimeImmutable();
+                    $token = JWT::decode($jwt, new Key($this->config->get('jwt.secret_key'), $this->config->get('jwt.alg')));
+                    $this->token = ($token->nbf > $now->getTimestamp() || $token->exp < $now->getTimestamp()) ? null : $token;
+                } catch (Exception $e) {
+                    $this->token = null;
+                }
+            }
+        }
+
         return $this->token;
     }
 }

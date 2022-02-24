@@ -80,7 +80,7 @@ class DatabaseService
               TABLE_SCHEMA = :database
         "
         );
-        $stmt->bindParam(':database', $data['database']);
+        $stmt->bindParam(':database', $database);
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -53,15 +53,9 @@ $injector->share($dbService);
 $authenticationService = $injector->make(AuthenticationService::class);
 
 // Setup database connection for a user that has logged in.
-$jwt = $authenticationService->getToken();
+$jwt = $authenticationService->getTokenFromRequest($request);
 if ($jwt) {
-    $dbConn = new PDO(
-        'mysql:host=' . $jwt->data['dbh'] . ';',
-        $jwt->data['dbu'],
-        $jwt->data['dbp'],
-        [PDO::ATTR_PERSISTENT => false]
-    );
-    $dbConn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $dbConn = $dbService->createPDO($jwt->data->dbh, $jwt->data->dbu, $jwt->data->dbp, $jwt->data->port);
     $injector->share($dbConn);
 }
 
