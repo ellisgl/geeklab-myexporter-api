@@ -17,7 +17,8 @@
         "geeklab/conf": "^3.1",
         "firebase/php-jwt": "^6.0",
         "ext-pdo": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "zircote/swagger-php": "^4.2"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",

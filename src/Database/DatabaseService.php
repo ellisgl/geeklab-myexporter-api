@@ -8,7 +8,7 @@ use \PDO;
 
 class DatabaseService
 {
-    private PDO $pdo;
+    private PDO    $pdo;
     private GLConf $config;
 
     public function __construct(GLConf $config, PDO $pdo)
@@ -47,6 +47,7 @@ class DatabaseService
 
     /**
      * Get the tables listed in a DB.
+     *
      * @param int    $hostIdx
      * @param string $database
      *

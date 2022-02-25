@@ -31,6 +31,12 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
     /**
      * Return a list of databases, filtered by excluded.
      *
+     * @OA\Get(
+     *     path="/databases",
+     *     summary="Require authentication",
+     *     @OA\Response(response="200", description="List of databases")
+     * )
+     *
      * @return JsonResponse
      */
     public function getDatabases(): JsonResponse
@@ -54,6 +60,12 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
 
     /**
      * Return a list of tables in a database.
+     *
+     * @OA\Get(
+     *     path="/databases/{database}/tables",
+     *     summary="Require authentication",
+     *     @OA\Response(response="200", description="List of tables")
+     * )
      *
      * @param array $data
      *

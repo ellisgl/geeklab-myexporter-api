@@ -19,9 +19,9 @@ return [
             'handler' => [DatabaseController::class, 'getDatabases']
         ],
         [
-          'methods' => ['GET'],
-          'path' => '/databases/{database}/tables',
-          'handler' => [DatabaseController::class, 'getTables']
+            'methods' => ['GET'],
+            'path'    => '/databases/{database}/tables',
+            'handler' => [DatabaseController::class, 'getTables']
         ],
         [
             'methods' => ['POST'],

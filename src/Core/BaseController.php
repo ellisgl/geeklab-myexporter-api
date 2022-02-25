@@ -7,7 +7,19 @@ namespace App\Core;
 use App\Authentication\AuthenticationService;
 use GeekLab\Conf\GLConf;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Info(title="GeekLab MyExporter API", version="0.1")
+ * @OA\SecurityScheme(
+ *      securityScheme="bearerAuth",
+ *      in="header",
+ *      name="bearerAuth",
+ *      type="http",
+ *      scheme="bearer",
+ *      bearerFormat="JWT",
+ * )
+ */
 class BaseController
 {
     protected GLConf       $config;
