@@ -13,7 +13,20 @@ class ServerController extends BaseController
     /**
      * Return array of indexed server names. No authentication needed.
      *
-     * @OA\Get(path="/servers", @OA\Response(response="200", description="List of servers"))
+     * @OA\Get(
+     *     path="/servers",
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of servers",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="id", type="integer", example="0"),
+     *                 @OA\Property(property="name", type="string", example="The DB Server"),
+     *             ),
+     *         ),
+     *     ),
+     * )
      * @return JsonResponse
      */
     public function getServers(): JsonResponse

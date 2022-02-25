@@ -27,15 +27,14 @@ class AuthenticationController extends BaseController
      *             required={"host", "username", "password"},
      *             @OA\Property(property="host", type="integer"),
      *             @OA\Property(property="username", type="string"),
-     *             @OA\Property(property="passwrod", type="string"),
+     *             @OA\Property(property="password", type="string"),
      *         )
      *     ),
      *     @OA\Response(
      *         response=200,
      *         description="JWT Response",
      *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="message", type="string", example="success"),
      *             @OA\Property(property="jwt", type="string"),
      *         )
      *     ),
@@ -54,7 +53,7 @@ class AuthenticationController extends BaseController
 
         $this->response->setData(
             [
-                'message' => 'Successful',
+                'message' => 'success',
                 'jwt'     => $this->authenticationService->doAuthentication($this->request)
             ]
         );
