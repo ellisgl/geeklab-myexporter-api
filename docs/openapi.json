@@ -68,11 +68,27 @@
         "/databases": {
             "get": {
                 "summary": "Require authentication",
-                "description": "Return a list of databases, filtered by excluded.",
                 "operationId": "d9efa44c5ef7e1555747d07ff6a07edd",
                 "responses": {
                     "200": {
-                        "description": "List of databases"
+                        "description": "Get a list of List of databases from a server, filter by excluded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "database": {
+                                                "description": "The database name",
+                                                "type": "string",
+                                                "example": "DB1"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -84,7 +100,29 @@
                 "operationId": "4e41018aeda131108ce22958e475aa20",
                 "responses": {
                     "200": {
-                        "description": "List of tables"
+                        "description": "List of tables",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "table": {
+                                                "description": "The table name",
+                                                "type": "string",
+                                                "example": "myTable"
+                                            },
+                                            "size": {
+                                                "description": "The table size in bytes",
+                                                "type": "integer",
+                                                "example": "102452"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -108,7 +146,7 @@
                                             },
                                             "name": {
                                                 "type": "string",
-                                                "example": "The DB Server"
+                                                "example": "The DB Server Name"
                                             }
                                         },
                                         "type": "object"
