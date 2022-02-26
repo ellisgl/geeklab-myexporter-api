@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Database;
 
+
 use App\Authentication\AuthenticationInterface;
 use App\Authentication\AuthenticationService;
 use App\Core\BaseController;
 use App\Core\Http\Exceptions\HttpBadRequestException;
-use GeekLab\Conf\GLConf;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Core\Request;
+use GeekLab\Conf\GLConf;
+use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class DatabaseController extends BaseController implements AuthenticationInterface
 {
@@ -29,19 +31,26 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
     }
 
     /**
-     * Return a list of databases, filtered by excluded.
-     *
      * @OA\Get(
      *     path="/databases",
      *     summary="Require authentication",
-     *     @OA\Response(response="200", description="List of databases")
+     *     @OA\Response(
+     *         response="200",
+     *         description="Get a list of List of databases from a server, filter by excluded",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="database", type="string", example="DB1", description="The database name"),
+     *             ),
+     *         ),
+     *     ),
      * )
      *
      * @return JsonResponse
      */
     public function getDatabases(): JsonResponse
     {
-        $data = ['databases' => []];
+        $data = [];
 
         /** @var object $jwt */
         $jwt = $this->authenticationService->getToken();
@@ -49,7 +58,7 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
         $dbs = $this->databaseService->getDatabases();
         foreach ($dbs as $db) {
             if (!in_array($db, $excludedTables, true)) {
-                $data['databases'][] = $db;
+                $data[] = $db;
             }
         }
 
@@ -64,7 +73,17 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
      * @OA\Get(
      *     path="/databases/{database}/tables",
      *     summary="Require authentication",
-     *     @OA\Response(response="200", description="List of tables")
+     *     @OA\Response(
+     *         response="200",
+     *         description="List of tables",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="table", type="string", example="myTable", description="The table name"),
+     *                 @OA\Property(property="size", type="integer", example="102452", description="The table size in bytes"),
+     *             ),
+     *         ),
+     *     )
      * )
      *
      * @param array $data

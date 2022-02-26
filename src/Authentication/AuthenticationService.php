@@ -8,11 +8,11 @@ use App\Core\Http\Exceptions\HttpUnauthorizedException;
 use App\Core\Request;
 use App\Database\PdoService;
 use DateTimeImmutable;
-use Exception;
+use \Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use GeekLab\Conf\GLConf;
-use JsonException;
+use \JsonException;
 
 class AuthenticationService
 {

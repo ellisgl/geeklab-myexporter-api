@@ -22,7 +22,7 @@ class ServerController extends BaseController
      *             type="array",
      *             @OA\Items(
      *                 @OA\Property(property="id", type="integer", example="0"),
-     *                 @OA\Property(property="name", type="string", example="The DB Server"),
+     *                 @OA\Property(property="name", type="string", example="The DB Server Name"),
      *             ),
      *         ),
      *     ),

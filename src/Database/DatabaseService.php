@@ -26,7 +26,7 @@ class DatabaseService
     {
         return array_map(
             static function ($row) {
-                return $row['Database'];
+                return ['database' => $row['Database']];
             },
             $this->pdo->query('SHOW DATABASES')->fetchAll(PDO::FETCH_ASSOC)
         );
@@ -73,7 +73,7 @@ class DatabaseService
         $stmt = $this->pdo->prepare(
             "
             SELECT
-              TABLE_NAME AS `name`,
+              TABLE_NAME AS `table`,
               (DATA_LENGTH + INDEX_LENGTH) AS `size`
             FROM
               information_schema.TABLES
@@ -84,6 +84,12 @@ class DatabaseService
         $stmt->bindParam(':database', $database);
         $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Loop through the results and format properly.
+        $ret = [];
+        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $ret[] = ['table' => $row['table'], 'size' => (int)$row['size']];
+        }
+
+        return $ret;
     }
 }
