@@ -19,14 +19,14 @@ class AuthenticationController extends BaseController
      *
      * @OA\Post(
      *     path="/login",
-     *     summary="Login with server index, username and password",
+     *     summary="Login with server id, username and password",
      *     operationId="authLogin",
      *     tags={"auth"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"host", "username", "password"},
-     *             @OA\Property(property="host", type="integer"),
+     *             required={"server_id", "username", "password"},
+     *             @OA\Property(property="server_id", type="integer"),
      *             @OA\Property(property="username", type="string"),
      *             @OA\Property(property="password", type="string"),
      *         )

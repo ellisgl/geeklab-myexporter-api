@@ -45,7 +45,7 @@ class AuthenticationService
         // Attempt a connection
         try {
             $this->dbService->createPDO(
-                $this->config->get('servers.' . (int) $data['host'] . '.host'),
+                $this->config->get('servers.' . (int) $data['server_id'] . '.host'),
                 $data['username'],
                 $data['password']
             );
@@ -58,17 +58,17 @@ class AuthenticationService
         return JWT::encode(
             [
                 'iss' => 'localhost',
-                'aud' => 'myExporter: ' . $this->config->get('servers.' . (int) $data['host'] . '.name'),
+                'aud' => 'myExporter: ' . $this->config->get('servers.' . (int) $data['server_id'] . '.name'),
                 'iat' => $iat,
                 'nbf' => $iat,
                 'exp' => $iat + 86400,
                 'hash' => sha1($request->getClientIp()),
                 'data' => [
                     'host' => (int) $data['host'],
-                    'dbh'  => $this->config->get('servers.' . (int) $data['host'] . '.host'),
+                    'dbh'  => $this->config->get('servers.' . (int) $data['server_id'] . '.host'),
                     'dbu'  => $data['username'],
                     'dbp'  => $data['password'],
-                    'port' => $this->config->get('servers.' . (int) $data['host'] . '.port') ?: 3306,
+                    'port' => $this->config->get('servers.' . (int) $data['server_id'] . '.port') ?: 3306,
                 ]
             ],
             $this->config->get('jwt.secret_key'),
