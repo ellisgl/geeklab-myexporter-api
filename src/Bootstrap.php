@@ -10,12 +10,11 @@ use App\Core\Http\HttpErrorService;
 use App\Core\Request;
 use App\Database\PdoService;
 use Auryn\Injector;
-use Exception;
+use \Exception;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use GeekLab\Conf\Driver\ArrayConfDriver;
 use GeekLab\Conf\GLConf;
-use PDO;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use function FastRoute\simpleDispatcher;

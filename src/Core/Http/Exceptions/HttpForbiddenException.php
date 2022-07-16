@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core\Http\Exceptions;
 
-use Exception;
+use \Exception;
 
 /**
  * HTTP Error 403

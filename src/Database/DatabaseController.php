@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Database;
 
-
 use App\Authentication\AuthenticationInterface;
 use App\Authentication\AuthenticationService;
 use App\Core\BaseController;
