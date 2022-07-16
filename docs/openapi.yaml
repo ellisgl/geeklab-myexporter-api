@@ -7,7 +7,7 @@ paths:
     post:
       tags:
         - auth
-      summary: 'Login with server index, username and password'
+      summary: 'Login with server id, username and password'
       description: 'Perform login.'
       operationId: authLogin
       requestBody:
@@ -16,11 +16,11 @@ paths:
           application/json:
             schema:
               required:
-                - host
+                - server_id
                 - username
                 - password
               properties:
-                host:
+                server_id:
                   type: integer
                 username:
                   type: string
