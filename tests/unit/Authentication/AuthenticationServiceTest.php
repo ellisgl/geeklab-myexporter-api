@@ -3,14 +3,16 @@
 namespace unit\Authentication;
 
 use App\Authentication\AuthenticationService;
+use App\Core\Http\Exceptions\HttpUnauthorizedException;
 use App\Core\Request;
 use App\Database\PdoService;
 use Firebase\JWT\JWT;
 use GeekLab\Conf\Driver\ArrayConfDriver;
 use GeekLab\Conf\GLConf;
+use \JsonException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use PDO;
+use \PDO;
 
 class AuthenticationServiceTest extends MockeryTestCase
 {
@@ -26,17 +28,22 @@ class AuthenticationServiceTest extends MockeryTestCase
         $confDir = __DIR__ . '/../../_data/conf/';
         $this->config = new GLConf(new ArrayConfDriver($confDir . 'config.php', $confDir));
         $this->config->init();
-        $dbServiceMock = Mockery::mock(PdoService::class . '[createPDO]');
-        $dbServiceMock->shouldReceive('createPDO')->once()->andReturns(Mockery::mock(PDO::class));
-        $this->authenticationService = new AuthenticationService($this->config, $dbServiceMock);
     }
 
     /**
      * @runInSeparateProcess
      * @preserveGlobalState disabled
+     *
+     * @return void
+     * @throws HttpUnauthorizedException
+     * @throws JsonException
      */
     public function testDoAuthentication(): void
     {
+        $dbServiceMock = Mockery::mock(PdoService::class . '[createPDO]');
+        $dbServiceMock->shouldReceive('createPDO')->once()->andReturns(Mockery::mock(PDO::class));
+        $this->createService($dbServiceMock);
+
         $request = new Request(
             [],
             [],
@@ -51,26 +58,46 @@ class AuthenticationServiceTest extends MockeryTestCase
         $this->assertNotEmpty($response);
     }
 
+    /**
+     * @return void
+     * @throws HttpUnauthorizedException
+     */
     public function testIsAuthenticated(): void
     {
-        // Creat a JWT normally
+        $dbServiceMock = Mockery::mock(PdoService::class);
+        $this->createService($dbServiceMock);
+
+        // Creat a JWT normally.
         $iat = time();
         $jwt = JWT::encode(
             [
-                'iss'  => 'localhost',
-                'aud'  => 'localhost',
-                'iat'  => $iat,
-                'nbf'  => $iat,
-                'exp'  => $iat + 86400,
+                'iss' => 'localhost',
+                'aud' => 'localhost',
+                'iat' => $iat,
+                'nbf' => $iat,
+                'exp' => $iat + 86400,
+                'hash' => sha1('127.0.0.1'),
                 'data' => ['test' => 'testing']
             ],
             $this->config->get('jwt.secret_key'),
             $this->config->get('jwt.alg')
         );
 
-        $request = new Request([],[],[],[],[], ['HTTP_AUTHORIZATION' => 'BEARER: ' . $jwt]);
+        $request = new Request(
+            [],
+            [],
+            [],
+            [],
+            [],
+            ['REMOTE_ADDR' => '127.0.0.1', 'HTTP_AUTHORIZATION' => 'BEARER: ' . $jwt]
+        );
         $this->authenticationService->isAuthenticated($request);
         $token = $this->authenticationService->getToken();
         $this->assertEquals('testing', $token->data->test);
+    }
+
+    private function createService(PdoService $dbServiceMock): void
+    {
+        $this->authenticationService = new AuthenticationService($this->config, $dbServiceMock);
     }
 }
