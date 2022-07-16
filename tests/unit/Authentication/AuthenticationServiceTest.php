@@ -43,8 +43,8 @@ class AuthenticationServiceTest extends MockeryTestCase
             [],
             [],
             [],
-            ['CONTENT-TYPE' => 'application/json'],
-            '{"host": 0, "username": "test", "password": "password"}'
+            ['REMOTE_ADDR' => '127.0.0.1', 'CONTENT-TYPE' => 'application/json'],
+            '{"server_id": 0, "username": "test", "password": "password"}'
         );
         $response = $this->authenticationService->doAuthentication($request);
         $this->assertIsString($response);

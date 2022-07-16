@@ -64,7 +64,7 @@ class AuthenticationService
                 'exp' => $iat + 86400,
                 'hash' => sha1($request->getClientIp()),
                 'data' => [
-                    'host' => (int) $data['host'],
+                    'host' => (int) $data['server_id'],
                     'dbh'  => $this->config->get('servers.' . (int) $data['server_id'] . '.host'),
                     'dbu'  => $data['username'],
                     'dbp'  => $data['password'],
