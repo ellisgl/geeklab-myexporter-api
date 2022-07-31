@@ -15,6 +15,7 @@ use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use GeekLab\Conf\Driver\ArrayConfDriver;
 use GeekLab\Conf\GLConf;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 use function FastRoute\simpleDispatcher;
@@ -84,7 +85,11 @@ switch ($routeInfo[0]) {
                 // Controller class and method.
                 [$className, $method] = $routeInfo[1];
                 $vars = $routeInfo[2];
-                $class = $injector->make($className);
+                try {
+                    $class = $injector->make($className);
+                } catch (Exception $e) {
+                    throw new BadRequestException();
+                }
 
                 // We'll do a middleware the manual way, instead of the PSR-15 way for now, till I find something better.
                 // If the controller class implements the Authentication interface, do an authentication check.
