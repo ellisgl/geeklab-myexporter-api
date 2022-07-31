@@ -44,12 +44,11 @@ class AuthenticationService
 
         // Attempt a connection
         try {
-            $port = $this->config->get('servers.' . (int) $data['server_id'] . '.port');
             $this->dbService->createPDO(
                 $this->config->get('servers.' . (int) $data['server_id'] . '.host'),
                 $data['username'],
                 $data['password'],
-                $port ?: 3306
+                $this->config->get('servers.' . (int) $data['server_id'] . '.port') ?: 3306
             );
         } catch (\Exception $e) {
             throw new HttpUnauthorizedException();
