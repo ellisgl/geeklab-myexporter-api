@@ -26,6 +26,8 @@ services:
     image: mysql:5.7.39
     networks:
       - backend
+    ports:
+      - '8306:3306'
     environment:
       - MYSQL_ROOT_PASSWORD=root
 networks:

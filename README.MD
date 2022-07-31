@@ -7,7 +7,8 @@ PHP Database Exporter that will have some neat features, because PHPMyAdmin is a
 ## Docker
 `$ docker-compose up --detach`
 
-http://localhost:8000
+* WEB: http://localhost:8000
+* MySQL localhost:8306
 
 ## Notes
 * Create a user for tests: test / password
