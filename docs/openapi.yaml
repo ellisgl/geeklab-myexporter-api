@@ -51,12 +51,12 @@ paths:
               schema:
                 type: array
                 items:
-                  properties: { database: { description: 'The database name', type: string, example: DB1 } }
+                  properties: { database: { description: 'The mysql name', type: string, example: DB1 } }
                   type: object
   '/databases/{database}/tables':
     get:
       summary: 'Require authentication'
-      description: 'Return a list of tables in a database.'
+      description: 'Return a list of tables in a mysql.'
       operationId: 4e41018aeda131108ce22958e475aa20
       responses:
         '200':

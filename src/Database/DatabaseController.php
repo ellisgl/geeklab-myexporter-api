@@ -39,7 +39,7 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
      *         @OA\JsonContent(
      *             type="array",
      *             @OA\Items(
-     *                 @OA\Property(property="database", type="string", example="DB1", description="The database name"),
+     *                 @OA\Property(property="mysql", type="string", example="DB1", description="The mysql name"),
      *             ),
      *         ),
      *     ),
@@ -67,10 +67,10 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
     }
 
     /**
-     * Return a list of tables in a database.
+     * Return a list of tables in a mysql.
      *
      * @OA\Get(
-     *     path="/databases/{database}/tables",
+     *     path="/databases/{mysql}/tables",
      *     summary="Require authentication",
      *     @OA\Response(
      *         response="200",
@@ -95,6 +95,6 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
         /** @var object $jwt */
         $jwt = $this->authenticationService->getToken();
 
-        return new JsonResponse($this->databaseService->getTables($jwt->data->host, $data['database']));
+        return new JsonResponse($this->databaseService->getTables($jwt->data->host, $data['mysql']));
     }
 }

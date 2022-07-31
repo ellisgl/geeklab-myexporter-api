@@ -26,7 +26,7 @@ class DatabaseService
     {
         return array_map(
             static function ($row) {
-                return ['database' => $row['Database']];
+                return ['mysql' => $row['Database']];
             },
             $this->pdo->query('SHOW DATABASES')->fetchAll(PDO::FETCH_ASSOC)
         );
@@ -78,10 +78,10 @@ class DatabaseService
             FROM
               information_schema.TABLES
             WHERE
-              TABLE_SCHEMA = :database
+              TABLE_SCHEMA = :mysql
         "
         );
-        $stmt->bindParam(':database', $database);
+        $stmt->bindParam(':mysql', $database);
         $stmt->execute();
 
         // Loop through the results and format properly.

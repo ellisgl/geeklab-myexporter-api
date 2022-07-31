@@ -51,7 +51,7 @@ $injector->share($dbService);
 /** @var AuthenticationService $authenticationService */
 $authenticationService = $injector->make(AuthenticationService::class);
 
-// Setup database connection for a user that has logged in.
+// Setup mysql connection for a user that has logged in.
 $jwt = $authenticationService->getTokenFromRequest($request);
 if ($jwt) {
     $dbConn = $dbService->createPDO($jwt->data->dbh, $jwt->data->dbu, $jwt->data->dbp, $jwt->data->port);

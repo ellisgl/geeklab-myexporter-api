@@ -2,7 +2,12 @@
 PHP Database Exporter that will have some neat features, because PHPMyAdmin is annoying.
 
 ## Installation
-$ composer install
+`$ composer install`
+
+## Docker
+`$ docker-compose up --detach`
+
+http://localhost:8000
 
 ## Notes
 * Create a user for tests: test / password
