@@ -105,8 +105,9 @@ class AuthenticationService
      */
     public function getTokenFromRequest(Request $request): ?object
     {
-        if ($request->server->get('HTTP_AUTHORIZATION')) {
-            $auth = explode(' ', $request->server->get('HTTP_AUTHORIZATION'));
+        $token = $request->server->get('HTTP_AUTHORIZATION') ?: $request->server->get('REDIRECT_HTTP_AUTHORIZATION');
+        if ($token) {
+            $auth = explode(' ', $token);
             if (!empty($auth[1])) {
                 $jwt = $auth[1];
 
