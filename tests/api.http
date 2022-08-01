@@ -1,0 +1,27 @@
+GET http://localhost:8000/servers
+Accept: application/json
+
+###
+POST http://localhost:8000/login
+Content-Type: application/json
+
+{
+    "server_id": 0,
+    "username": "root",
+    "password": "root"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+    client.global.set("auth_token", response.body.jwt);
+});
+
+%}
+
+
+###
+GET http://localhost:8000/databases
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+###
