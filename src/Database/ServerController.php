@@ -32,7 +32,7 @@ class ServerController extends BaseController
     public function getServers(): JsonResponse
     {
         $servers = [];
-        foreach($this->config->get('servers') as $key => $value) {
+        foreach ($this->config->get('servers') as $key => $value) {
             $servers[] = ['id' => $key, 'name' => $value['name']];
         }
 

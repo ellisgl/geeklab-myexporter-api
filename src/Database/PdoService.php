@@ -2,7 +2,7 @@
 
 namespace App\Database;
 
-use \PDO;
+use PDO;
 
 class PdoService
 {

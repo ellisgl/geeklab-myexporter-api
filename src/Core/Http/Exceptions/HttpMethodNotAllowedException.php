@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace App\Core\Http\Exceptions;
 
-use \Exception;
+use Exception;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * HTTP Error 405
  */
 class HttpMethodNotAllowedException extends Exception
 {
-    public function __construct($message = "", $code = 0, Exception $previous = null)
+    /**
+     * @param                  $message
+     * @param Exception | null $previous
+     * @param                  $code
+     */
+    public function __construct($message = '', ?Exception $previous = null, $code = Response::HTTP_METHOD_NOT_ALLOWED)
     {
         parent::__construct($message, $code, $previous);
     }

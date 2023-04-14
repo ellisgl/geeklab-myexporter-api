@@ -10,24 +10,24 @@ return [
     'routes' => [
         [
             'methods' => ['GET'],
-            'path'    => '/servers',
-            'handler' => [ServerController::class, 'getServers']
+            'path' => '/servers',
+            'handler' => [ServerController::class, 'getServers'],
         ],
         [
             'methods' => ['GET'],
-            'path'    => '/databases',
-            'handler' => [DatabaseController::class, 'getDatabases']
+            'path' => '/databases',
+            'handler' => [DatabaseController::class, 'getDatabases'],
         ],
         [
             'methods' => ['GET'],
-            'path'    => '/databases/{database}/tables',
-            'handler' => [DatabaseController::class, 'getTables']
+            'path' => '/databases/{database}/tables',
+            'handler' => [DatabaseController::class, 'getTables'],
         ],
         [
             'methods' => ['POST'],
-            'path'    => '/login',
-            'handler' => [AuthenticationController::class, 'login']
+            'path' => '/login',
+            'handler' => [AuthenticationController::class, 'login'],
         ],
         // Wildcards need to be at the bottom.
-    ]
+    ],
 ];

@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace App\Core\Http\Exceptions;
 
-use \Exception;
+use Exception;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * HTTP Error 401
  */
 class HttpUnauthorizedException extends Exception
 {
-    public function __construct($message = "", $code = 0, Exception $previous = null)
+    /**
+     * @param                  $message
+     * @param Exception | null $previous
+     * @param                  $code
+     */
+    public function __construct($message = '', ?Exception $previous = null, $code = Response::HTTP_UNAUTHORIZED)
     {
         parent::__construct($message, $code, $previous);
     }

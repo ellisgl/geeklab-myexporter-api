@@ -4,135 +4,95 @@ declare(strict_types=1);
 
 namespace App\Core\Http;
 
-use App\Core\Http\Exceptions\HttpForbiddenException;
-use App\Core\Http\Exceptions\HttpUnauthorizedException;
 use App\Core\Http\Exceptions\HttpBadRequestException;
+use App\Core\Http\Exceptions\HttpForbiddenException;
 use App\Core\Http\Exceptions\HttpMethodNotAllowedException;
 use App\Core\Http\Exceptions\HttpNotFoundException;
-use \Exception;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Core\Http\Exceptions\HttpUnauthorizedException;
+use Exception;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * This is for handling HTTP errors.
  */
 class HttpErrorService
 {
-    // @Todo: Methods for logging?
-    // @Todo: More HTTP error code handling.
-    /**
-     * Return an HTTP 400 BAD REQUEST response
-     *
-     * @param string | null $message
-     *
-     * @return JsonResponse
-     */
-    public function error400(?string $message = null): JsonResponse
-    {
-        $response = new JsonResponse();
-        $response->setStatusCode(JsonResponse::HTTP_BAD_REQUEST);
-        $response->setContent($message ?: '400 - Bad request');
-
-        return $response;
+    public function __construct(
+        private readonly ?LoggerInterface $logger = null,
+        private readonly array $logErrorCodes = [400, 401, 403, 404, 405, 500],
+    ) {
     }
 
-    /**
-     * Return an HTTP 401 UNAUTHORIZED response.
-     *
-     * @param string | null $message
-     *
-     * @return JsonResponse
-     */
-    public function error401(?string $message = null): JsonResponse
-    {
-        $response = new JsonResponse();
-        $response->setStatusCode(JsonResponse::HTTP_UNAUTHORIZED);
-        $response->setContent($message ?: '401 - Unauthorized');
-
-        return $response;
-    }
-
-    /**
-     * Return an HTTP 403 FORBIDDEN response.
-     *
-     * @param string | null $message
-     *
-     * @return JsonResponse
-     */
-    public function error403(?string $message = null): JsonResponse
-    {
-        $response = new JsonResponse();
-        $response->setStatusCode(JsonResponse::HTTP_FORBIDDEN);
-        $response->setContent($message ?: '403 - Forbidden');
-
-        return $response;
-    }
-
-    /**
-     * Create an HTTP 404 NOT FOUND response.
-     *
-     * @param string | null $message
-     *
-     * @return JsonResponse
-     */
-    public function error404(?string $message = null): JsonResponse
-    {
-        $response = new JsonResponse();
-        $response->setStatusCode(JsonResponse::HTTP_NOT_FOUND);
-        $response->setContent($message ?: '404 - Page not found');
-
-        return $response;
-    }
-
-    /**
-     * Create an HTTP 405 METHOD NOT ALLOWED response.
-     *
-     * @param string | null $message
-     *
-     * @return JsonResponse
-     */
-    public function error405(?string $message = null): JsonResponse
-    {
-        $response = new JsonResponse();
-        $response->setStatusCode(JsonResponse::HTTP_METHOD_NOT_ALLOWED);
-        $response->setContent($message ?: '405 - Method not allowed');
-
-        return $response;
-    }
-
-    public function error500(?string $message = null): JsonResponse
-    {
-        $response = new JsonResponse();
-        $response->setStatusCode(JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
-        $response->setContent($message ?: '500 - Internal server error');
-
-
-        return $response;
-    }
     /**
      * Convert an exception into a matching error response.
      *
-     * @param Exception $e
+     * @param Request         $request
+     * @param Exception       $e
+     * @param Response | null $response
      *
-     * @return JsonResponse
+     * @return Response
      */
-    public function handleError(Exception $e): JsonResponse
+    public function handleError(Request $request, Exception $e, ?Response $response = null): Response
     {
+        if (!$response) {
+            $response = new Response();
+        }
+
         // Detect HTTP error exceptions and return the correct response.
         // Will need to use better class names and more classes.
-        switch (get_class($e)) {
-            case HttpBadRequestException::class:
-                return $this->error400($e->getMessage() ?: null);
-            case HttpUnauthorizedException::class:
-                return $this->error401($e->getMessage() ?: null);
-            case HttpForbiddenException::class:
-                return $this->error403($e->getMessage() ?: null);
-            case HttpNotFoundException::class:
-                return $this->error404($e->getMessage() ?: null);
-            case HttpMethodNotAllowedException::class:
-                return $this->error405($e->getMessage() ?: null);
-            default:
-                // I don't think we want the exception message to get out to the wild, do we?
-                return $this->error500();
+        if (
+            in_array(
+                get_class($e),
+                [
+                    HttpBadRequestException::class,
+                    HttpUnauthorizedException::class,
+                    HttpForbiddenException::class,
+                    HttpNotFoundException::class,
+                    HttpMethodNotAllowedException::class,
+                ],
+            )
+        ) {
+            $response->setStatusCode($e->getCode());
+            $response->setContent(
+                $e->getMessage() ?: $e->getCode() . ' - ' . Response::$statusTexts[$e->getCode()],
+            );
+        } else {
+            $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response->setContent(
+                $e->getMessage()
+                    ?: Response::HTTP_INTERNAL_SERVER_ERROR .
+                    ' - ' .
+                    Response::$statusTexts[Response::HTTP_INTERNAL_SERVER_ERROR],
+            );
         }
+
+        if ($this->logger && in_array($response->getStatusCode(), $this->logErrorCodes)) {
+            $this->logError($response->getStatusCode(), $request, $response, $e->getMessage());
+        }
+
+        return $response;
+    }
+
+    /**
+     * Log HTTP error.
+     *
+     * @param int             $httpStatusCode
+     * @param Request         $request
+     * @param Response | null $response
+     * @param string | null   $message
+     *
+     * @return void
+     */
+    private function logError(
+        int $httpStatusCode,
+        Request $request,
+        ?Response $response = null,
+        ?string $message = null,
+    ): void {
+        $this->logger->error(
+            "$httpStatusCode - " . Response::$statusTexts[$httpStatusCode],
+            [$message, $request, $response],
+        );
     }
 }

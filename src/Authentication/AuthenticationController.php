@@ -6,8 +6,8 @@ namespace App\Authentication;
 
 use App\Core\BaseController;
 use App\Core\Http\Exceptions\HttpUnauthorizedException;
-use App\Core\Request;
-use \JsonException;
+use App\Core\Http\Request;
+use JsonException;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;

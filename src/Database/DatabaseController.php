@@ -8,7 +8,7 @@ use App\Authentication\AuthenticationInterface;
 use App\Authentication\AuthenticationService;
 use App\Core\BaseController;
 use App\Core\Http\Exceptions\HttpBadRequestException;
-use App\Core\Request;
+use App\Core\Http\Request;
 use GeekLab\Conf\GLConf;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -78,8 +78,8 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
      *         @OA\JsonContent(
      *             type="array",
      *             @OA\Items(
-     *                 @OA\Property(property="table", type="string", example="myTable", description="The table name"),
-     *                 @OA\Property(property="size", type="integer", example="102452", description="The table size in bytes"),
+     *                 @OA\Property(property="table", type="string", example="myTable", description="Table name"),
+     *                 @OA\Property(property="size", type="integer", example="1024", description="Table size in bytes"),
      *             ),
      *         ),
      *     )

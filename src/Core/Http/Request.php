@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Core;
+namespace App\Core\Http;
 
-use \JsonException;
+use JsonException;
 
 class Request extends \Symfony\Component\HttpFoundation\Request
 {

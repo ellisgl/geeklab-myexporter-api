@@ -4,15 +4,15 @@ namespace unit\Authentication;
 
 use App\Authentication\AuthenticationService;
 use App\Core\Http\Exceptions\HttpUnauthorizedException;
-use App\Core\Request;
+use App\Core\Http\Request;
 use App\Database\PdoService;
 use Firebase\JWT\JWT;
 use GeekLab\Conf\Driver\ArrayConfDriver;
 use GeekLab\Conf\GLConf;
-use \JsonException;
+use JsonException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use \PDO;
+use PDO;
 
 class AuthenticationServiceTest extends MockeryTestCase
 {
@@ -40,6 +40,7 @@ class AuthenticationServiceTest extends MockeryTestCase
      */
     public function testDoAuthentication(): void
     {
+        /** @var PdoService|Mockery\LegacyMockInterface|Mockery\MockInterface $dbServiceMock */
         $dbServiceMock = Mockery::mock(PdoService::class . '[createPDO]');
         $dbServiceMock->shouldReceive('createPDO')->once()->andReturns(Mockery::mock(PDO::class));
         $this->createService($dbServiceMock);

@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Authentication;
 
 use App\Core\Http\Exceptions\HttpUnauthorizedException;
-use App\Core\Request;
+use App\Core\Http\Request;
 use App\Database\PdoService;
 use DateTimeImmutable;
-use \Exception;
+use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use GeekLab\Conf\GLConf;
-use \JsonException;
+use JsonException;
 
 class AuthenticationService
 {
@@ -50,7 +50,7 @@ class AuthenticationService
                 $data['password'],
                 $this->config->get('servers.' . (int) $data['server_id'] . '.port') ?: 3306
             );
-        } catch (\Exception $e) {
+        } catch (Exception) {
             throw new HttpUnauthorizedException();
         }
 
@@ -122,7 +122,7 @@ class AuthenticationService
                     ) || $token->hash !== $hash
                         ? null
                         : $token;
-                } catch (Exception $e) {
+                } catch (Exception) {
                     $this->token = null;
                 }
             }

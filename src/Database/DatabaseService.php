@@ -86,7 +86,7 @@ class DatabaseService
 
         // Loop through the results and format properly.
         $ret = [];
-        while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $ret[] = ['table' => $row['table'], 'size' => (int)$row['size']];
         }
 
