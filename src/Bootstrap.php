@@ -41,6 +41,9 @@ $errorService = new HttpErrorService();
 // Create the DatabaseService object.
 $dbService = new PdoService();
 
+// Create the AuthenticationService object.
+$authenticationService = new AuthenticationService($config, $dbService);
+
 // Configure and init dependency injection.
 /** @var Injector $injector */
 $injector = include_once('Dependencies.php');
@@ -58,9 +61,8 @@ try {
     // Share the dbService.
     $injector->share($dbService);
 
-    // Make sure we have an authentication system created.
-    /** @var AuthenticationService $authenticationService */
-    $authenticationService = $injector->make(AuthenticationService::class);
+    // Share the AuthenticationService.
+    $injector->share($authenticationService);
 
     // Setup mysql connection for a user that has logged in.
     $jwt = $authenticationService->getTokenFromRequest($request);
