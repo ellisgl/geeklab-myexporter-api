@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Core\Http;
 
-use App\Core\Http\Exceptions\HttpBadRequestException;
-use App\Core\Http\Exceptions\HttpForbiddenException;
-use App\Core\Http\Exceptions\HttpMethodNotAllowedException;
-use App\Core\Http\Exceptions\HttpNotFoundException;
-use App\Core\Http\Exceptions\HttpUnauthorizedException;
+use App\Core\Http\Exceptions\HttpException;
 use Exception;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * This is for handling HTTP errors.
+ * Create a Response object from exceptions.
+ * This class will also log the error, if configured to do so.
  */
 class HttpErrorService
 {
@@ -27,32 +25,24 @@ class HttpErrorService
     /**
      * Convert an exception into a matching error response.
      *
-     * @param Request         $request
-     * @param Exception       $e
-     * @param Response | null $response
+     * @param Request                        $request
+     * @param Exception                      $e
+     * @param JsonResponse | Response | null $response
      *
      * @return Response
      */
-    public function handleError(Request $request, Exception $e, ?Response $response = null): Response
-    {
+    public function handleError(
+        Request $request,
+        Exception $e,
+        JsonResponse | Response | null $response = null,
+    ): Response {
         if (!$response) {
             $response = new Response();
         }
 
         // Detect HTTP error exceptions and return the correct response.
         // Will need to use better class names and more classes.
-        if (
-            in_array(
-                get_class($e),
-                [
-                    HttpBadRequestException::class,
-                    HttpUnauthorizedException::class,
-                    HttpForbiddenException::class,
-                    HttpNotFoundException::class,
-                    HttpMethodNotAllowedException::class,
-                ],
-            )
-        ) {
+        if ($e instanceof HttpException) {
             $response->setStatusCode($e->getCode());
             $response->setContent(
                 $e->getMessage() ?: $e->getCode() . ' - ' . Response::$statusTexts[$e->getCode()],
@@ -67,8 +57,8 @@ class HttpErrorService
             );
         }
 
-        if ($this->logger && in_array($response->getStatusCode(), $this->logErrorCodes)) {
-            $this->logError($response->getStatusCode(), $request, $response, $e->getMessage());
+        if (in_array($response->getStatusCode(), $this->logErrorCodes)) {
+            $this->logError($e, $response->getStatusCode(), $request, $response);
         }
 
         return $response;
@@ -77,22 +67,36 @@ class HttpErrorService
     /**
      * Log HTTP error.
      *
+     * @param Exception       $e
      * @param int             $httpStatusCode
      * @param Request         $request
      * @param Response | null $response
-     * @param string | null   $message
      *
      * @return void
      */
     private function logError(
+        Exception $e,
         int $httpStatusCode,
         Request $request,
         ?Response $response = null,
-        ?string $message = null,
     ): void {
-        $this->logger->error(
-            "$httpStatusCode - " . Response::$statusTexts[$httpStatusCode],
-            [$message, $request, $response],
-        );
+        if ($this->logger) {
+            $this->logger->error(
+                "$httpStatusCode - " . Response::$statusTexts[$httpStatusCode],
+                [$e, $request, $response],
+            );
+        } else {
+            error_log(
+                json_encode(
+                    [
+                        'exception' => $e->getMessage(),
+                        'request' => $request->toArray(),
+                        'trace' => $e?->getTraceAsString(),
+                        'response_status_code' => $response->getStatusCode(),
+                        'response_content' => $response->getContent(),
+                    ],
+                ),
+            );
+        }
     }
 }

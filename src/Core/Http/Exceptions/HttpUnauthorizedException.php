@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * HTTP Error 401
  */
-class HttpUnauthorizedException extends Exception
+class HttpUnauthorizedException extends HttpException
 {
     /**
      * @param                  $message

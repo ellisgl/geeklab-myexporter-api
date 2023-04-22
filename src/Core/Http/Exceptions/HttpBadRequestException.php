@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * HTTP Error 400
  */
-class HttpBadRequestException extends Exception
+class HttpBadRequestException extends HttpException
 {
     /**
      * @param                  $message

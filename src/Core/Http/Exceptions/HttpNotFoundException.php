@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * HTTP Error 404
  */
-class HttpNotFoundException extends Exception
+class HttpNotFoundException extends HttpException
 {
     /**
      * @param                  $message

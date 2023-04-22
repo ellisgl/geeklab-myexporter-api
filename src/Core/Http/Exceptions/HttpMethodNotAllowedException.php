@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * HTTP Error 405
  */
-class HttpMethodNotAllowedException extends Exception
+class HttpMethodNotAllowedException extends HttpException
 {
     /**
      * @param                  $message

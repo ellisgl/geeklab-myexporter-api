@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * HTTP Error 403
  */
-class HttpForbiddenException extends Exception
+class HttpForbiddenException extends HttpException
 {
     /**
      * @param                  $message
