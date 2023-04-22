@@ -25,3 +25,10 @@ Authorization: Bearer {{auth_token}}
 Accept: application/json
 
 ###
+
+###
+GET http://localhost:8000/databases/test/tables
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+###
