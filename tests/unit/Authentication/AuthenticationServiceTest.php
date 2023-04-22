@@ -22,6 +22,9 @@ class AuthenticationServiceTest extends MockeryTestCase
     /** @var AuthenticationService $service */
     private AuthenticationService $authenticationService;
 
+    /**
+     * @return void
+     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -78,25 +81,23 @@ class AuthenticationServiceTest extends MockeryTestCase
                 'nbf' => $iat,
                 'exp' => $iat + 86400,
                 'hash' => sha1('127.0.0.1'),
-                'data' => ['test' => 'testing']
+                'data' => ['test' => 'testing'],
             ],
             $this->config->get('jwt.secret_key'),
-            $this->config->get('jwt.alg')
+            $this->config->get('jwt.alg'),
         );
 
-        $request = new Request(
-            [],
-            [],
-            [],
-            [],
-            [],
-            ['REMOTE_ADDR' => '127.0.0.1', 'HTTP_AUTHORIZATION' => 'BEARER: ' . $jwt]
-        );
+        $request = new Request(server: ['REMOTE_ADDR' => '127.0.0.1', 'HTTP_AUTHORIZATION' => 'BEARER: ' . $jwt]);
         $this->authenticationService->isAuthenticated($request);
         $token = $this->authenticationService->getToken();
         $this->assertEquals('testing', $token->data->test);
     }
 
+    /**
+     * @param PdoService $dbServiceMock
+     *
+     * @return void
+     */
     private function createService(PdoService $dbServiceMock): void
     {
         $this->authenticationService = new AuthenticationService($this->config, $dbServiceMock);

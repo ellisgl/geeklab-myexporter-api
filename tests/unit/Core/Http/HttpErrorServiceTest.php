@@ -83,6 +83,78 @@ class HttpErrorServiceTest extends TestCase
     }
 
     /**
+     * Test logging functionality, using the defaulted message.
+     *
+     * @return void
+     */
+    public function testLoggingMatchingStatusDefaultMessage(): void
+    {
+        $httpErrorService = new HttpErrorService($this->logger, [400, 500]);
+
+        $request = new Request();
+        $response = new JsonResponse();
+        $response->setStatusCode(Response::HTTP_OK)->setContent('XXX');
+
+        // Make sure the response object is modified.
+        $res = clone $response;
+        $res->setStatusCode(Response::HTTP_BAD_REQUEST)
+            ->setContent(Response::HTTP_BAD_REQUEST . ' - ' . Response::$statusTexts[Response::HTTP_BAD_REQUEST]);
+
+        $this
+            ->logger
+            ->expects($this->once())
+            ->method('error')
+            ->with(
+                Response::HTTP_BAD_REQUEST . ' - ' . Response::$statusTexts[Response::HTTP_BAD_REQUEST],
+                ['', $request, $response],
+            );
+        $httpErrorService->handleError(new Request(), new HttpBadRequestException(), $response);
+    }
+
+    /**
+     * Test logging functionality using a passed-in message.
+     *
+     * @return void
+     */
+    public function testLoggingMatchingStatusWithMessage(): void
+    {
+        $httpErrorService = new HttpErrorService($this->logger, [400, 500]);
+
+        $request = new Request();
+        $response = new JsonResponse();
+        $response->setStatusCode(Response::HTTP_OK)->setContent('XXX');
+
+        // Make sure the response object is modified.
+        $res = clone $response;
+        $res->setStatusCode(Response::HTTP_BAD_REQUEST)
+            ->setContent('Test');
+
+        $this
+            ->logger
+            ->expects($this->once())
+            ->method('error')
+            ->with(
+                Response::HTTP_BAD_REQUEST . ' - ' . Response::$statusTexts[Response::HTTP_BAD_REQUEST],
+                ['Test', $request, $res],
+            );
+        $httpErrorService->handleError(new Request(), new HttpBadRequestException('Test'), $response);
+    }
+
+    /**
+     * Test logging functionality of an unknown exception object.
+     *
+     * @return void
+     */
+    public function testLoggingNotMatching(): void
+    {
+        $httpErrorService = new HttpErrorService($this->logger, [400, 500]);
+
+        $this->logger->expects($this->never())->method('error');
+
+        $httpErrorService->handleError(new Request(), new HttpNotFoundException('Test'));
+    }
+
+    /**
      * Test HTTP 404 error.
      *
      * @return void
@@ -152,65 +224,5 @@ class HttpErrorServiceTest extends TestCase
         $res = $this->httpErrorService->handleError(new Request(), new HttpUnauthorizedException('Test'));
         $this->assertEquals(JsonResponse::HTTP_UNAUTHORIZED, $res->getStatusCode());
         $this->assertEquals('Test', $res->getContent());
-    }
-
-    public function testLoggingMatchingStatusDefaultMessage(): void
-    {
-        $httpErrorService = new HttpErrorService($this->logger, [400, 500]);
-
-        $request = new Request();
-        $response = new JsonResponse();
-        $response->setStatusCode(Response::HTTP_OK)->setContent('XXX');
-
-        // Make sure the response object is modified.
-        $res = clone $response;
-        $res->setStatusCode(Response::HTTP_BAD_REQUEST)
-            ->setContent(Response::HTTP_BAD_REQUEST . ' - ' . Response::$statusTexts[Response::HTTP_BAD_REQUEST]);
-
-        $this
-            ->logger
-            ->expects($this->once())
-            ->method('error')
-            ->with(
-                Response::HTTP_BAD_REQUEST . ' - ' . Response::$statusTexts[Response::HTTP_BAD_REQUEST],
-                ['', $request, $response],
-            );
-        $httpErrorService->handleError(new Request(), new HttpBadRequestException(), $response);
-    }
-
-    public function testLoggingMatchingStatusWithMessage(): void
-    {
-        $httpErrorService = new HttpErrorService($this->logger, [400, 500]);
-
-        $request = new Request();
-        $response = new JsonResponse();
-        $response->setStatusCode(Response::HTTP_OK)->setContent('XXX');
-
-        // Make sure the response object is modified.
-        $res = clone $response;
-        $res->setStatusCode(Response::HTTP_BAD_REQUEST)
-            ->setContent('Test');
-
-        $this
-            ->logger
-            ->expects($this->once())
-            ->method('error')
-            ->with(
-                Response::HTTP_BAD_REQUEST . ' - ' . Response::$statusTexts[Response::HTTP_BAD_REQUEST],
-                ['Test', $request, $res],
-            );
-        $httpErrorService->handleError(new Request(), new HttpBadRequestException('Test'), $response);
-    }
-
-    public function testLoggingNotMatching(): void
-    {
-        $httpErrorService = new HttpErrorService($this->logger, [400, 500]);
-
-        $this
-            ->logger
-            ->expects($this->never())
-            ->method('error');
-
-        $httpErrorService->handleError(new Request(), new HttpNotFoundException('Test'));
     }
 }
