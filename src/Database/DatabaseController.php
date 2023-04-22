@@ -29,6 +29,11 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
         $this->databaseService = $databaseService;
     }
 
+    public function export(array $data): JsonResponse
+    {
+        return new JsonResponse();
+    }
+
     /**
      * @OA\Get(
      *     path="/databases",
@@ -70,7 +75,7 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
      * Return a list of tables in a mysql.
      *
      * @OA\Get(
-     *     path="/databases/{mysql}/tables",
+     *     path="/databases/{database}/tables",
      *     summary="Require authentication",
      *     @OA\Response(
      *         response="200",
@@ -85,7 +90,7 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
      *     )
      * )
      *
-     * @param array $data
+     * @param array{database: string} $data
      *
      * @return JsonResponse
      * @throws HttpBadRequestException
@@ -95,6 +100,6 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
         /** @var object $jwt */
         $jwt = $this->authenticationService->getToken();
 
-        return new JsonResponse($this->databaseService->getTables($jwt->data->host, $data['mysql']));
+        return new JsonResponse($this->databaseService->getTables($jwt->data->host, $data['database']));
     }
 }
