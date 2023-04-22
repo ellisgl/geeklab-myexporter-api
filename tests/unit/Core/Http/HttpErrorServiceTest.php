@@ -100,15 +100,16 @@ class HttpErrorServiceTest extends TestCase
         $res->setStatusCode(Response::HTTP_BAD_REQUEST)
             ->setContent(Response::HTTP_BAD_REQUEST . ' - ' . Response::$statusTexts[Response::HTTP_BAD_REQUEST]);
 
+        $exception = new HttpBadRequestException();
         $this
             ->logger
             ->expects($this->once())
             ->method('error')
             ->with(
                 Response::HTTP_BAD_REQUEST . ' - ' . Response::$statusTexts[Response::HTTP_BAD_REQUEST],
-                ['', $request, $response],
+                [$exception, $request, $response],
             );
-        $httpErrorService->handleError(new Request(), new HttpBadRequestException(), $response);
+        $httpErrorService->handleError(new Request(), $exception, $response);
     }
 
     /**
@@ -129,15 +130,16 @@ class HttpErrorServiceTest extends TestCase
         $res->setStatusCode(Response::HTTP_BAD_REQUEST)
             ->setContent('Test');
 
+        $exception = new HttpBadRequestException('Test');
         $this
             ->logger
             ->expects($this->once())
             ->method('error')
             ->with(
                 Response::HTTP_BAD_REQUEST . ' - ' . Response::$statusTexts[Response::HTTP_BAD_REQUEST],
-                ['Test', $request, $res],
+                [$exception, $request, $res],
             );
-        $httpErrorService->handleError(new Request(), new HttpBadRequestException('Test'), $response);
+        $httpErrorService->handleError(new Request(), $exception, $response);
     }
 
     /**
