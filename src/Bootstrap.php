@@ -12,7 +12,6 @@ use App\Core\Http\Exceptions\HttpNotFoundException;
 use App\Core\Http\HttpErrorService;
 use App\Core\Http\Request;
 use App\Database\PdoService;
-use App\Exception\KablooeyException;
 use Auryn\Injector;
 use Exception;
 use FastRoute\Dispatcher;
@@ -36,13 +35,20 @@ $config = new GLConf(
 $config->init();
 $environment = $config->get('env');
 
-try {
-    // Create the DatabaseService object.
-    $dbService = new PdoService();
+// Create the ErrorService object.
+$errorService = new HttpErrorService();
 
-    // Configure and init dependency injection.
-    /** @var Injector $injector */
-    $injector = include_once('Dependencies.php');
+// Create the DatabaseService object.
+$dbService = new PdoService();
+
+// Configure and init dependency injection.
+/** @var Injector $injector */
+$injector = include_once('Dependencies.php');
+
+/** @var JsonResponse | null $response */
+$response = null;
+
+try {
     /** @var Request $request */
     $request = $injector->make(Request::class);
 
@@ -76,54 +82,54 @@ try {
     $routeInfo = $dispatcher->dispatch($request->getMethod(), $request->getPathInfo());
 
     // Add in some extra case handling and execute the route endpoint.
-    $errorService = $injector->make(HttpErrorService::class);
+    $injector->share($errorService);
 
-    /** @var JsonResponse $response */
-    try {
-        switch ($routeInfo[0]) {
-            case Dispatcher::METHOD_NOT_ALLOWED:
-                throw new HttpMethodNotAllowedException();
+    switch ($routeInfo[0]) {
+        case Dispatcher::METHOD_NOT_ALLOWED:
+            throw new HttpMethodNotAllowedException();
 
-            case Dispatcher::FOUND:
-                if (is_array($routeInfo[1])) {
-                    // Controller class and method.
-                    [$className, $method] = $routeInfo[1];
-                    $vars = $routeInfo[2];
-                    try {
-                        $class = $injector->make($className);
-                    } catch (Exception $e) {
-                        throw new HttpBadRequestException($e->getMessage(), $e);
-                    }
-
-                    // We'll do a middleware the manual way,
-                    // instead of the PSR-15 way until I find something better.
-                    // If the controller class implements the Authentication interface, do an authentication check.
-                    if (in_array(AuthenticationInterface::class, class_implements($class), true)) {
-                        $authenticationService->isAuthenticated($request);
-                    }
-
-                    // Execute the action method.
-                    $response = $class->$method($vars);
-                } elseif (is_callable($routeInfo[1])) {
-                    // Closure endpoint.
-                    $response = $injector->make(JsonResponse::class);
-                    $response->setContent($injector->execute($routeInfo[1]));
-                } else {
-                    // We have something bad here.
-                    throw new HttpBadRequestException('Route not callable.');
+        case Dispatcher::FOUND:
+            if (is_array($routeInfo[1])) {
+                // Controller class and method.
+                [$className, $method] = $routeInfo[1];
+                $vars = $routeInfo[2];
+                try {
+                    $class = $injector->make($className);
+                } catch (Exception $e) {
+                    throw new HttpBadRequestException($e->getMessage(), $e);
                 }
-                break;
 
-            case Dispatcher::NOT_FOUND:
-            default:
-                throw new HttpNotFoundException();
-        }
-    } catch (Exception $e) {
-        $response = $errorService->handleError($request, $e, $response);
+                // We'll do a middleware the manual way,
+                // instead of the PSR-15 way until I find something better.
+                // If the controller class implements the Authentication interface, do an authentication check.
+                if (in_array(AuthenticationInterface::class, class_implements($class), true)) {
+                    $authenticationService->isAuthenticated($request);
+                }
+
+                // Execute the action method.
+                $response = $class->$method($vars);
+            } elseif (is_callable($routeInfo[1])) {
+                // Closure endpoint.
+                $response = $injector->make(JsonResponse::class);
+                $response->setContent($injector->execute($routeInfo[1]));
+            } else {
+                // We have something bad here.
+                throw new HttpBadRequestException('Route not callable.');
+            }
+            break;
+
+        case Dispatcher::NOT_FOUND:
+        default:
+            throw new HttpNotFoundException();
     }
 
     // Output the response to the viewer.
     $response->send();
 } catch (Exception $e) {
-    throw new KablooeyException($e->getMessage(), $e->getCode(), $e);
+    if (!$response) {
+        $response = new JsonResponse();
+    }
+
+    $response = $errorService->handleError($request, $e, $response);
+    $response->send();
 }
