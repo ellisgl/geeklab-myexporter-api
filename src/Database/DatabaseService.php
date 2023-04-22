@@ -4,11 +4,11 @@ namespace App\Database;
 
 use App\Core\Http\Exceptions\HttpBadRequestException;
 use GeekLab\Conf\GLConf;
-use \PDO;
+use PDO;
 
 class DatabaseService
 {
-    private PDO    $pdo;
+    private PDO $pdo;
     private GLConf $config;
 
     public function __construct(GLConf $config, PDO $pdo)
@@ -28,7 +28,7 @@ class DatabaseService
             static function ($row) {
                 return ['mysql' => $row['Database']];
             },
-            $this->pdo->query('SHOW DATABASES')->fetchAll(PDO::FETCH_ASSOC)
+            $this->pdo->query('SHOW DATABASES')->fetchAll(PDO::FETCH_ASSOC),
         );
     }
 
@@ -42,6 +42,7 @@ class DatabaseService
     public function getExcludedDatabases(int $hostIdx): array
     {
         $excludedTables = $this->config->get("servers.$hostIdx.excluded_databases");
+
         return is_array($excludedTables) ? $excludedTables : [];
     }
 
@@ -79,7 +80,7 @@ class DatabaseService
               information_schema.TABLES
             WHERE
               TABLE_SCHEMA = :mysql
-        "
+        ",
         );
         $stmt->bindParam(':mysql', $database);
         $stmt->execute();

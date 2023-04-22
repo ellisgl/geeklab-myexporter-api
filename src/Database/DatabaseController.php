@@ -22,7 +22,7 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
         Request $request,
         JsonResponse $response,
         AuthenticationService $authenticationService,
-        DatabaseService $databaseService
+        DatabaseService $databaseService,
     ) {
         parent::__construct($config, $request, $response, $authenticationService);
 
