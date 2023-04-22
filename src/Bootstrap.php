@@ -36,12 +36,21 @@ $config->init();
 $environment = $config->get('env');
 
 // Create the Request object.
-$request = new Request(query: $_GET, request: $_POST, cookies: $_COOKIE, files: $_FILES, server: $_SERVER);
+$request = new Request(
+    query  : $_GET,
+    request: $_POST,
+    cookies: $_COOKIE,
+    files  : $_FILES,
+    server : $_SERVER
+);
 
 $errorService = new HttpErrorService();
 
 // Create the DatabaseService object.
 $dbService = new PdoService();
+
+// Create the Injector object, so we can do injections.
+$injector = new Injector();
 
 // Create the AuthenticationService object.
 $authenticationService = new AuthenticationService($config, $dbService);
@@ -50,9 +59,11 @@ $authenticationService = new AuthenticationService($config, $dbService);
 $response = null;
 
 try {
-    // Configure and init dependency injection.
-    /** @var Injector $injector */
-    $injector = include_once('Dependencies.php');
+    // Create the response object, so we can output to our users.
+    $injector->share(JsonResponse::class);
+
+    // Create the authentication object, so people can log in.
+    $injector->share(AuthenticationService::class);
 
     // Share the Configuration object.
     $injector->share($config);
