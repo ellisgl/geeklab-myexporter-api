@@ -35,7 +35,9 @@ $config = new GLConf(
 $config->init();
 $environment = $config->get('env');
 
-// Create the ErrorService object.
+// Create the Request object.
+$request = new Request(query: $_GET, request: $_POST, cookies: $_COOKIE, files: $_FILES, server: $_SERVER);
+
 $errorService = new HttpErrorService();
 
 // Create the DatabaseService object.
@@ -44,22 +46,22 @@ $dbService = new PdoService();
 // Create the AuthenticationService object.
 $authenticationService = new AuthenticationService($config, $dbService);
 
-// Configure and init dependency injection.
-/** @var Injector $injector */
-$injector = include_once('Dependencies.php');
-
 /** @var JsonResponse | null $response */
 $response = null;
 
 try {
-    /** @var Request $request */
-    $request = $injector->make(Request::class);
+    // Configure and init dependency injection.
+    /** @var Injector $injector */
+    $injector = include_once('Dependencies.php');
 
-    // Share the configuration with the rest of the system.
+    // Share the Configuration object.
     $injector->share($config);
 
     // Share the dbService.
     $injector->share($dbService);
+
+    // Share the Request object.
+    $injector->share($request);
 
     // Share the AuthenticationService.
     $injector->share($authenticationService);
