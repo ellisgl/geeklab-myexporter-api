@@ -55,8 +55,8 @@ class AuthenticationController extends BaseController
         $this->response->setData(
             [
                 'message' => 'success',
-                'jwt'     => $this->authenticationService->doAuthentication($this->request)
-            ]
+                'jwt' => $this->authenticationService->doAuthentication($this->request),
+            ],
         );
         $this->response->setStatusCode(JsonResponse::HTTP_OK);
 
