@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-return [
+/** @var array{servers: array{name:string, host: string, excluded_databases: string[]}} $configuration */
+$configuration = [
     'servers' => [
         [
             'name' => 'The Box',
@@ -12,3 +13,5 @@ return [
         ],
     ],
 ];
+
+return $configuration;

@@ -6,7 +6,10 @@ use App\Authentication\AuthenticationController;
 use App\Database\DatabaseController;
 use App\Database\ServerController;
 
-return [
+/**
+ * @var array{rautes: array{methods: array<string>, path: string, handler: array<string, string>}} $configuration
+ */
+$configuration = [
     'routes' => [
         [
             'methods' => ['GET'],
@@ -31,3 +34,5 @@ return [
         // Wildcards need to be at the bottom.
     ],
 ];
+
+return $configuration;
