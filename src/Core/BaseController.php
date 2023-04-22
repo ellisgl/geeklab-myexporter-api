@@ -23,20 +23,11 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class BaseController
 {
-    protected GLConf       $config;
-    protected Request      $request;
-    protected JsonResponse $response;
-    protected AuthenticationService $authenticationService;
-
     public function __construct(
-        GLConf $config,
-        Request $request,
-        JsonResponse $response,
-        AuthenticationService $authenticationService
+        protected readonly GLConf $config,
+        protected readonly Request $request,
+        protected readonly JsonResponse $response,
+        protected readonly AuthenticationService $authenticationService
     ) {
-        $this->config = $config;
-        $this->request = $request;
-        $this->response = $response;
-        $this->authenticationService = $authenticationService;
     }
 }
