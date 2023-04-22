@@ -2,12 +2,16 @@
 
 declare(strict_types=1);
 
-return [
+/**
+ * @var array{enviroment: string, conf: string[]} $configuration
+ */
+$configuration = [
     'environment' => 'test',
-    'conf'        => [
+    'conf' => [
         'routes',
         'servers',
         'jwt',
-    ]
+    ],
 ];
 
+return $configuration;
