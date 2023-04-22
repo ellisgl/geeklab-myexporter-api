@@ -8,6 +8,7 @@ class Request extends \Symfony\Component\HttpFoundation\Request
 {
     /**
      * Get content from request (POST, PUT, PATCH typically), and JSON decodes it into an array.
+     *
      * @return array
      * @throws JsonException
      */
