@@ -26,7 +26,7 @@ class DatabaseService
     {
         return array_map(
             static function ($row) {
-                return ['mysql' => $row['Database']];
+                return $row['Database'];
             },
             $this->pdo->query('SHOW DATABASES')->fetchAll(PDO::FETCH_ASSOC),
         );
@@ -59,12 +59,12 @@ class DatabaseService
     {
         $excludedDatabases = $this->getExcludedDatabases($hostIdx);
         if (in_array($database, $excludedDatabases, true)) {
-            throw new HttpBadRequestException('Bad Request');
+            throw new HttpBadRequestException('Bad Request : 0x0001');
         }
 
         $dbs = $this->getDatabases();
         if (!in_array($database, $dbs, true)) {
-            throw new HttpBadRequestException('Bad Request');
+            throw new HttpBadRequestException('Bad Request: 0x0002');
         }
 
         // Select our db.

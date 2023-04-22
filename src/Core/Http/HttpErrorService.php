@@ -86,11 +86,18 @@ class HttpErrorService
                 [$e, $request, $response],
             );
         } else {
+            $r = [
+                'body' =>
+                in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH])
+                    ? $request->toArray()
+                    : [],
+                'uri' => $request->getUri(),
+            ];
             error_log(
                 json_encode(
                     [
                         'exception' => $e->getMessage(),
-                        'request' => $request->toArray(),
+                        'request' => $r,
                         'trace' => $e?->getTraceAsString(),
                         'response_status_code' => $response->getStatusCode(),
                         'response_content' => $response->getContent(),
