@@ -15,6 +15,9 @@ services:
       - '8306:3306'
     environment:
       - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./docker/mysql/setup.sql:/docker-entrypoint-initdb.d/setup.sql
+      - ./container-files/mysql:/var/lib/mysql
 
   php:
     build: './docker/php/'
