@@ -14,7 +14,6 @@ use App\Core\Http\Exceptions\HttpNotFoundException;
 use App\Core\Http\HttpErrorService;
 use App\Core\Http\Request;
 use App\Database\PdoService;
-use Auryn\ConfigException;
 use Auryn\Injector;
 use Exception;
 use FastRoute\Dispatcher;
@@ -22,8 +21,6 @@ use FastRoute\RouteCollector;
 use GeekLab\Conf\Driver\ArrayConfDriver;
 use GeekLab\Conf\GLConf;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
-use Symfony\Component\HttpFoundation\Response;
 
 use function FastRoute\simpleDispatcher;
 
@@ -97,11 +94,11 @@ try {
     };
     $dispatcher = simpleDispatcher($routeDefinitionCallback);
 
-    // Match the request to a route.
-    $routeInfo = $dispatcher->dispatch($request->getMethod(), $request->getPathInfo());
-
     // Add in some extra case handling and execute the route endpoint.
     $injector->share($errorService);
+
+    // Match the request to a route.
+    $routeInfo = $dispatcher->dispatch($request->getMethod(), $request->getPathInfo());
 
     switch ($routeInfo[0]) {
         case Dispatcher::METHOD_NOT_ALLOWED:
@@ -151,142 +148,4 @@ try {
 
     $response = $errorService->handleError($request, $e, $response);
     $response->send();
-}
-
-class Bootstrap
-{
-    private string $environment = 'development';
-    private JsonResponse | Response | null $response = null;
-    private ?AuthenticationService $authenticationService = null;
-    private object | null $jwt = null;
-
-    public function __construct(
-        private GLConf $config,
-        private Request $request,
-        private HttpErrorService $errorService,
-        private PdoService $dbService,
-        private Injector $injector,
-    ) {
-    }
-
-    /**
-     * Initialize the bootstrap without polluting the constructor with business logic.
-     *
-     * @param GLConf | null           $config
-     * @param Request | null          $request
-     * @param HttpErrorService | null $errorService
-     * @param PdoService | null       $dbService
-     * @param Injector | null         $injector
-     *
-     * @return self
-     */
-    public static function initiialize(
-        ?GLConf $config = null,
-        ?Request $request = null,
-        ?HttpErrorService $errorService = null,
-        ?PdoService $dbService = null,
-        ?Injector $injector = null,
-    ): self {
-        if (!$config) {
-            $config = new GLConf(
-                new ArrayConfDriver(__DIR__ . '/../config/config.php', __DIR__ . '/../config/'),
-                [],
-                ['keys_lower_case']
-            );
-        }
-
-        if (!$request) {
-            $request = new Request(
-                query  : $_GET,
-                request: $_POST,
-                cookies: $_COOKIE,
-                files  : $_FILES,
-                server : $_SERVER
-            );
-        }
-
-        if (!$errorService) {
-            $errorService = new HttpErrorService();
-        }
-
-        if (!$dbService) {
-            $dbService = new PdoService();
-        }
-
-        if (!$injector) {
-            $injector = new Injector();
-        }
-
-        return new self(
-            $config,
-            $request,
-            $errorService,
-            $dbService,
-            $injector
-        );
-    }
-
-    public function run(): void
-    {
-        $this->config->init();
-        $this->environment = $this->config->get('env') ?? 'development';
-
-        // Create the AuthenticationService object.
-        $this->authenticationService = new AuthenticationService($this->config, $this->dbService);
-
-        $this->shareBasicDependencies();
-        $this->startPdo();
-
-    }
-
-    private function route(): Response
-    {
-
-    }
-
-    /**
-     * @return void
-     * @throws ConfigException
-     */
-    private function shareBasicDependencies(): void
-    {
-        // Create the response object, so we can output to our users.
-        $this->injector->share(JsonResponse::class);
-
-        // Create the authentication object, so people can log in.
-        $this->injector->share(AuthenticationService::class);
-
-        // Share the Configuration object.
-        $this->injector->share($this->config);
-
-        // Share the dbService.
-        $this->injector->share($this->dbService);
-
-        // Share the Request object.
-        $this->injector->share($this->request);
-
-        // Share the AuthenticationService.
-        $this->injector->share($this->authenticationService);
-    }
-
-    /**
-     * Create PDO connection based on the JWT.
-     *
-     * @return void
-     * @throws ConfigException
-     */
-    private function startPdo(): void
-    {
-        // Setup mysql connection for a user that has logged in.
-        $this->jwt = $this->authenticationService->getTokenFromRequest($this->request);
-        if ($this->jwt) {
-            $dbConn = $this->dbService->createPDO(
-                $this->jwt->data->dbh,
-                $this->jwt->data->dbu,
-                $this->jwt->data->dbp,
-                $this->jwt->data->port,
-            );
-            $this->injector->share($dbConn);
-        }
-    }
 }
