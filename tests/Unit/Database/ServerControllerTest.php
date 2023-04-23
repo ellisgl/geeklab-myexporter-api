@@ -26,8 +26,9 @@ class ServerControllerTest extends ControllerTestCase
             server : $_SERVER
         );
 
-        chdir(__DIR__ . '/../../../src');
-        include('Bootstrap.php');
+        // Change to src directory, so Bootstrap.php can find its includes,
+        chdir(APP_ROOT . '/src');
+        include(APP_ROOT . '/src/Bootstrap.php');
 
         /** @var Response $response */
         $contents = json_decode($response->getContent(), true);

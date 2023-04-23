@@ -9,6 +9,26 @@ use Test\Unit\ControllerTestCase;
 
 class AuthenticationControllerTest extends ControllerTestCase
 {
+    public function testLoginWithWrongHttpMethod(): void
+    {
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/login';
+        $request = new Request(
+            query  : $_GET,
+            request: $_POST,
+            cookies: $_COOKIE,
+            files  : $_FILES,
+            server : $_SERVER
+        );
+
+        // Change to src directory, so Bootstrap.php can find its includes,
+        chdir(APP_ROOT . '/src');
+        include(APP_ROOT . '/src/Bootstrap.php');
+        /** @var Response $response */
+        $this->assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $response->getStatusCode());
+    }
+
     /**
      * @return void
      * @throws GuzzleException
@@ -27,8 +47,9 @@ class AuthenticationControllerTest extends ControllerTestCase
             content: json_encode(['server_id' => 1, 'username' => 'root', 'password' => 'root'])
         );
 
-        chdir(__DIR__ . '/../../../src');
-        include('Bootstrap.php');
+        // Change to src directory, so Bootstrap.php can find its includes,
+        chdir(APP_ROOT . '/src');
+        include(APP_ROOT . '/src/Bootstrap.php');
 
         /** @var Response $response */
         $contents = json_decode($response->getContent(), true);

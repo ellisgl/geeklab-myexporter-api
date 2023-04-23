@@ -6,6 +6,9 @@ namespace App;
 
 error_reporting(E_ALL);
 
+require_once('../constants.php');
+require_once(APP_ROOT . '/vendor/autoload.php');
+
 use App\Authentication\AuthenticationInterface;
 use App\Authentication\AuthenticationService;
 use App\Core\Http\Exceptions\HttpBadRequestException;
@@ -26,14 +29,15 @@ use function FastRoute\simpleDispatcher;
 
 // Initialize our configuration system.
 $config = new GLConf(
-    new ArrayConfDriver(__DIR__ . '/../config/config.php', __DIR__ . '/../config/'),
+    new ArrayConfDriver(APP_CFG. '/config.php', APP_CFG . '/'),
     [],
     ['keys_lower_case']
 );
 $config->init();
-$environment = $config->get('env');
+// $environment = $config->get('env');
 
-// Create the Request object.
+// Create the Request object if it doesn't exist.
+// This allows for "injecting" from the controller tests.
 /** @var Request | null $request */
 if (!$request) {
     $request = new Request(
