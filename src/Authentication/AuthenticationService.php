@@ -119,10 +119,12 @@ class AuthenticationService
                         new Key($this->config->get('jwt.secret_key'), $this->config->get('jwt.alg')),
                     );
                     $hash = sha1($request->getClientIp());
-                    $this->token = $token->nbf > $now->getTimestamp() || $token->exp < $now->getTimestamp(
-                    ) || $token->hash !== $hash
-                        ? null
-                        : $token;
+                    $this->token =
+                        $token->nbf > $now->getTimestamp() ||
+                        $token->exp < $now->getTimestamp() ||
+                        $token->hash !== $hash
+                            ? null
+                            : $token;
                 } catch (Exception) {
                     $this->token = null;
                 }
