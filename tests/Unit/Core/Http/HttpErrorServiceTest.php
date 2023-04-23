@@ -1,6 +1,6 @@
 <?php
 
-namespace unit\Core\Http;
+namespace Test\Unit\Core\Http;
 
 use App\Core\Http\Exceptions\HttpBadRequestException;
 use App\Core\Http\Exceptions\HttpForbiddenException;

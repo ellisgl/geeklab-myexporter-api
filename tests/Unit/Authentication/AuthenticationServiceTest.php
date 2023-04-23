@@ -1,6 +1,6 @@
 <?php
 
-namespace unit\Authentication;
+namespace Test\Unit\Authentication;
 
 use App\Authentication\AuthenticationService;
 use App\Core\Http\Exceptions\HttpUnauthorizedException;
