@@ -99,7 +99,7 @@ class HttpErrorService
                     [
                         'exception' => $e->getMessage(),
                         'request' => $r,
-                        'trace' => $e?->getTraceAsString(),
+                        'trace' => $e->getTraceAsString(),
                         'response_status_code' => $response->getStatusCode(),
                         'response_content' => $response->getContent(),
                     ],
