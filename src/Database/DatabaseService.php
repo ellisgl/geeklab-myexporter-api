@@ -20,28 +20,37 @@ class DatabaseService
     /**
      * Get a list of databases on host server.
      *
-     * @param string $host   The host we want the DB's from.
-     * @param bool   $filter Filter out databases listed in excluded databases configuration.
+     * @param int  $hostIdx The index of the host we want the DB's from.
+     * @param bool $filter  Filter out databases listed in excluded databases configuration.
      *
      * @return array
      */
-    public function getDatabases(string $host, bool $filter = true): array
+    public function getDatabases(int $hostIdx, bool $filter = true): array
     {
-        $excludedDatabases = $this->getExcludedDatabases($host);
+        $excludedDatabases = $this->getExcludedDatabases($hostIdx);
 
         // Return an array of databases that are not in the exclusion list.
-        return array_filter(
+        $dbs = array_map(
+            function ($row) {
+                return $row['Database'];
+            },
             $this->pdo->query('SHOW DATABASES')->fetchAll(PDO::FETCH_ASSOC),
-            function($row) use ($excludedDatabases) {
-                return !in_array($row['Database'], $excludedDatabases);
-            }
         );
+
+        return $filter
+            ? array_filter(
+                $dbs,
+                function ($db) use ($excludedDatabases) {
+                    return !in_array($db, $excludedDatabases);
+                }
+            )
+            : $dbs;
     }
 
     /**
      * Get an array of excluded tables.
      *
-     * @param int $hostIdx
+     * @param int $hostIdx The index of the host we want to get the excluded databases from.
      *
      * @return array
      */
@@ -50,11 +59,6 @@ class DatabaseService
         $excludedTables = $this->config->get("servers.$hostIdx.excluded_databases");
 
         return is_array($excludedTables) ? $excludedTables : [];
-    }
-
-    public function getHostFromIndex(int $hostIdx): ?string
-    {
-        return $this->config->get("servers.$hostIdx.host");
     }
 
     /**
@@ -68,14 +72,15 @@ class DatabaseService
      */
     public function getTables(int $hostIdx, string $database): array
     {
+        // Make sure the database requested isn't in the excluded list, or doesn't exist.
         $excludedDatabases = $this->getExcludedDatabases($hostIdx);
         if (in_array($database, $excludedDatabases, true)) {
-            throw new HttpBadRequestException('Bad Request : 0x0001');
+            throw new HttpBadRequestException('Bad Request');
         }
 
-        $dbs = $this->getDatabases();
+        $dbs = $this->getDatabases($hostIdx);
         if (!in_array($database, $dbs, true)) {
-            throw new HttpBadRequestException('Bad Request: 0x0002');
+            throw new HttpBadRequestException('Bad Request');
         }
 
         // Select our db.

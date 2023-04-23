@@ -29,11 +29,6 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
         $this->databaseService = $databaseService;
     }
 
-    public function export(array $data): JsonResponse
-    {
-        return new JsonResponse();
-    }
-
     /**
      * @OA\Get(
      *     path="/databases",

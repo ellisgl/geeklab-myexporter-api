@@ -27,12 +27,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use function FastRoute\simpleDispatcher;
 
-// Initialize our configuration system.
-$config = new GLConf(
-    new ArrayConfDriver(APP_CFG. '/config.php', APP_CFG . '/'),
-    [],
-    ['keys_lower_case']
-);
+// Create the Configuration object if it doesn't exist.
+// This allows for "injecting" from the controller tests.
+/**  @var GLConf | null $config */
+if (!$config) {
+    $config = new GLConf(
+        new ArrayConfDriver(APP_CFG . '/config.php', APP_CFG . '/'),
+        [],
+        ['keys_lower_case']
+    );
+}
 $config->init();
 // $environment = $config->get('env');
 
@@ -49,7 +53,12 @@ if (!$request) {
     );
 }
 
-$errorService = new HttpErrorService();
+// Create the HttpErrorService object if it doesn't exist.
+// This allows for "injecting" from the controller tests.
+/** @var HttpErrorService | null $errorService */
+if (!$errorService) {
+    $errorService = new HttpErrorService();
+}
 
 // Create the DatabaseService object.
 $dbService = new PdoService();
