@@ -44,8 +44,8 @@ class AuthenticationService
                 $data['password'],
                 $this->config->get('servers.' . (int)$data['server_id'] . '.port') ?: 3306,
             );
-        } catch (Exception) {
-            throw new HttpUnauthorizedException();
+        } catch (Exception $e) {
+            throw new HttpUnauthorizedException($e->getMessage());
         }
 
         // Create a JWT token and return it.

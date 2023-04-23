@@ -2,10 +2,10 @@
 
 namespace Test\Unit\Database;
 
+use App\Core\Http\Request;
 use GuzzleHttp\Exception\GuzzleException;
+use Symfony\Component\HttpFoundation\Response;
 use Test\Unit\ControllerTestCase;
-
-use function PHPUnit\Framework\assertEquals;
 
 class ServerControllerTest extends ControllerTestCase
 {
@@ -15,14 +15,26 @@ class ServerControllerTest extends ControllerTestCase
      */
     public function testGetServers(): void
     {
-        $response = $this->client->request(
-            'GET',
-            'servers'
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/servers';
+        $request = new Request(
+            query  : $_GET,
+            request: $_POST,
+            cookies: $_COOKIE,
+            files  : $_FILES,
+            server : $_SERVER
         );
 
-        $contents = json_decode($response->getBody()->getContents(), true);
-        foreach ($this->config->get('servers') as $key => $server) {
-            assertEquals($server['name'], $contents[$key]['name']);
-        }
+        chdir(__DIR__ . '/../../../src');
+        include('Bootstrap.php');
+
+        /** @var Response $response */
+        $contents = json_decode($response->getContent(), true);
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertCount(2, $contents);
+        $this->assertEquals($this->config->get('servers.0.name'), $contents[0]['name']);
+        $this->assertEquals($this->config->get('servers.1.name'), $contents[1]['name']);
     }
 }

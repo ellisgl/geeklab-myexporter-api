@@ -36,13 +36,16 @@ $config->init();
 $environment = $config->get('env');
 
 // Create the Request object.
-$request = new Request(
-    query  : $_GET,
-    request: $_POST,
-    cookies: $_COOKIE,
-    files  : $_FILES,
-    server : $_SERVER
-);
+/** @var Request | null $request */
+if (!$request) {
+    $request = new Request(
+        query  : $_GET,
+        request: $_POST,
+        cookies: $_COOKIE,
+        files  : $_FILES,
+        server : $_SERVER
+    );
+}
 
 $errorService = new HttpErrorService();
 
