@@ -87,6 +87,7 @@ class HttpErrorService
             );
         } else {
             $r = [
+                'method' => $request->getMethod(),
                 'body' =>
                 in_array($request->getMethod(), [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH])
                     ? $request->toArray()

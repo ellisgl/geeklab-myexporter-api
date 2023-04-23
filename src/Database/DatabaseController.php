@@ -59,7 +59,7 @@ class DatabaseController extends BaseController implements AuthenticationInterfa
         /** @var object $jwt */
         $jwt = $this->authenticationService->getToken();
         $excludedTables = $this->databaseService->getExcludedDatabases($jwt->data->host);
-        $dbs = $this->databaseService->getDatabases();
+        $dbs = $this->databaseService->getDatabases($jwt->data->host);
 
         foreach ($dbs as $db) {
             if (!in_array($db, $excludedTables, true)) {

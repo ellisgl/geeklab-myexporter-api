@@ -1,34 +1,34 @@
+###
+# @name List Servers
 GET http://localhost:8000/servers
 Accept: application/json
 
 ###
+# @name Login
 POST http://localhost:8000/login
 Content-Type: application/json
 
 {
-    "server_id": 0,
-    "username": "root",
-    "password": "root"
+  "server_id": 0,
+  "username": "root",
+  "password": "root"
 }
 
 > {%
-client.test("Request executed successfully", function() {
-    client.global.set("auth_token", response.body.jwt);
-});
+    client.test("Request executed successfully", function () {
+        client.global.set("auth_token", response.body.jwt);
+    });
 
 %}
 
-
 ###
+#  @name List Databases
 GET http://localhost:8000/databases
 Authorization: Bearer {{auth_token}}
 Accept: application/json
 
 ###
-
-###
+# @name List Tables
 GET http://localhost:8000/databases/test/tables
 Authorization: Bearer {{auth_token}}
 Accept: application/json
-
-###

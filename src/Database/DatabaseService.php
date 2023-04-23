@@ -18,17 +18,23 @@ class DatabaseService
     }
 
     /**
-     * Get databases listed on the host.
+     * Get a list of databases on host server.
+     *
+     * @param string $host   The host we want the DB's from.
+     * @param bool   $filter Filter out databases listed in excluded databases configuration.
      *
      * @return array
      */
-    public function getDatabases(): array
+    public function getDatabases(string $host, bool $filter = true): array
     {
-        return array_map(
-            static function ($row) {
-                return $row['Database'];
-            },
+        $excludedDatabases = $this->getExcludedDatabases($host);
+
+        // Return an array of databases that are not in the exclusion list.
+        return array_filter(
             $this->pdo->query('SHOW DATABASES')->fetchAll(PDO::FETCH_ASSOC),
+            function($row) use ($excludedDatabases) {
+                return !in_array($row['Database'], $excludedDatabases);
+            }
         );
     }
 
@@ -44,6 +50,11 @@ class DatabaseService
         $excludedTables = $this->config->get("servers.$hostIdx.excluded_databases");
 
         return is_array($excludedTables) ? $excludedTables : [];
+    }
+
+    public function getHostFromIndex(int $hostIdx): ?string
+    {
+        return $this->config->get("servers.$hostIdx.host");
     }
 
     /**

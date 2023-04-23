@@ -10,6 +10,8 @@ use App\Core\Http\Exceptions\HttpUnauthorizedException;
 use App\Core\Http\HttpErrorService;
 use App\Core\Http\Request;
 use ErrorException;
+use Faker\Factory;
+use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,6 +21,7 @@ class HttpErrorServiceTest extends TestCase
 {
     private HttpErrorService $httpErrorService;
     private LoggerInterface $logger;
+    private Generator $faker;
 
     /**
      * @return void
@@ -27,7 +30,6 @@ class HttpErrorServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->httpErrorService = new HttpErrorService();
         $this->logger = $this
             ->getMockBuilder(LoggerInterface::class)
             ->onlyMethods(
@@ -44,6 +46,10 @@ class HttpErrorServiceTest extends TestCase
                 ],
             )
             ->getMock();
+        $this->httpErrorService = new HttpErrorService($this->logger);
+
+        // Use the factory to create a Faker\Generator instance.
+        $this->faker = Factory::create();
     }
 
     /**
@@ -157,6 +163,36 @@ class HttpErrorServiceTest extends TestCase
     }
 
     /**
+     * Test that logging takes in the body content of request when a PATCH request is made and logger is null.
+     *
+     * @return void
+     */
+    public function testLoggingWithPatchMethod(): void
+    {
+        $this->loggingWithMethodsThatHaveABodyTest(Request::METHOD_PATCH);
+    }
+
+    /**
+     * Test that logging takes in the body content of request when a POST request is made and logger is null.
+     *
+     * @return void
+     */
+    public function testLoggingWithPostMethod(): void
+    {
+        $this->loggingWithMethodsThatHaveABodyTest(Request::METHOD_POST);
+    }
+
+    /**
+     * Test that logging takes in the body content of request when a PUT request is made and logger is null.
+     *
+     * @return void
+     */
+    public function testLoggingWithPutMethod(): void
+    {
+        $this->loggingWithMethodsThatHaveABodyTest(Request::METHOD_PUT);
+    }
+
+    /**
      * Test HTTP 404 error.
      *
      * @return void
@@ -226,5 +262,32 @@ class HttpErrorServiceTest extends TestCase
         $res = $this->httpErrorService->handleError(new Request(), new HttpUnauthorizedException('Test'));
         $this->assertEquals(JsonResponse::HTTP_UNAUTHORIZED, $res->getStatusCode());
         $this->assertEquals('Test', $res->getContent());
+    }
+
+    private function loggingWithMethodsThatHaveABodyTest(string $method): void
+    {
+        $httpErrorService = new HttpErrorService(null, [400, 500]);
+
+        // Create a PATCH Request object with JSON body.
+        $content = ['name' => $this->faker->word()];
+        $request = new Request(
+            server: ['REQUEST_URI' => '/testing' . $method, 'REQUEST_METHOD' => $method],
+            content: json_encode($content)
+        );
+
+        // Set the temporary file (stream) to store error_log entries in.
+        $errorLogTmpFile = tmpFile();
+        $errorLogLocationBackup = ini_set('error_log', stream_get_meta_data($errorLogTmpFile)['uri']);
+
+        $exception = new HttpBadRequestException();
+        $httpErrorService->handleError($request, $exception, new JsonResponse());
+
+        // Set error_log back to the default.
+        ini_set('error_log', $errorLogLocationBackup);
+
+        $result = stream_get_contents($errorLogTmpFile);
+        $this->assertMatchesRegularExpression('/"method":"' . $method .'"/', $result);
+        $this->assertMatchesRegularExpression('/"body":{"name":"' . $content['name'] . '"}/', $result);
+        $this->assertMatchesRegularExpression('/\\/testing' . $method . '"/', $result);
     }
 }
