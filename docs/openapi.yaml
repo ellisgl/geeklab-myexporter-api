@@ -21,7 +21,7 @@ paths:
                 - password
               properties:
                 server_id:
-                  type: integer
+                  type: number
                 username:
                   type: string
                 password:

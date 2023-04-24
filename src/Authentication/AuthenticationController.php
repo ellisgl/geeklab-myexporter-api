@@ -26,7 +26,7 @@ class AuthenticationController extends BaseController
      *         required=true,
      *         @OA\JsonContent(
      *             required={"server_id", "username", "password"},
-     *             @OA\Property(property="server_id", type="integer"),
+     *             @OA\Property(property="server_id", type="number"),
      *             @OA\Property(property="username", type="string"),
      *             @OA\Property(property="password", type="string"),
      *         )
