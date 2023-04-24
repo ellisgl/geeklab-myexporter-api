@@ -19,6 +19,9 @@ class ServerControllerTest extends ControllerTestCase
         $_SERVER['REQUEST_URI'] = '/servers';
         // No need to create the Request object here, the bootstrap can handle this one for us.
 
+        // Inject the config object.
+        $config = self::$config;
+
         // Change to src directory, so Bootstrap.php can find its includes,
         chdir(APP_ROOT . '/src');
         include(APP_ROOT . '/src/Bootstrap.php');
@@ -27,8 +30,7 @@ class ServerControllerTest extends ControllerTestCase
         $contents = json_decode($response->getContent(), true);
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertCount(2, $contents);
+        $this->assertCount(1, $contents);
         $this->assertEquals(self::$config->get('servers.0.name'), $contents[0]['name']);
-        $this->assertEquals(self::$config->get('servers.1.name'), $contents[1]['name']);
     }
 }

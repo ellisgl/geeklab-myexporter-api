@@ -9,6 +9,7 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 /**
  * Create a Response object from exceptions.
@@ -26,14 +27,14 @@ class HttpErrorService
      * Convert an exception into a matching error response.
      *
      * @param Request                        $request
-     * @param Exception                      $e
+     * @param Throwable                      $e
      * @param JsonResponse | Response | null $response
      *
      * @return Response
      */
     public function handleError(
         Request $request,
-        Exception $e,
+        Throwable $e,
         JsonResponse | Response | null $response = null,
     ): Response {
         if (!$response) {
@@ -75,7 +76,7 @@ class HttpErrorService
      * @return void
      */
     private function logError(
-        Exception $e,
+        Throwable $e,
         int $httpStatusCode,
         Request $request,
         ?Response $response = null,

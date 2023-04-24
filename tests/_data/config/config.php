@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * @var array{enviroment: string, conf: string[]} $configuration
+ * @var array{enviroment: string, conf: string[] | array} $configuration
  */
 $configuration = [
     'environment' => 'test',

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * @var array{ jwt: array{ secret_key: string, alg: string }} $configuration
+ * @var array{jwt: array{secret_key: string, alg: string}} $configuration
  */
 $configuration = [
     'jwt' => [

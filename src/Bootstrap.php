@@ -11,39 +11,42 @@ require_once(APP_ROOT . '/vendor/autoload.php');
 
 use App\Authentication\AuthenticationInterface;
 use App\Authentication\AuthenticationService;
-use App\Core\Http\Exceptions\HttpBadRequestException;
 use App\Core\Http\Exceptions\HttpMethodNotAllowedException;
 use App\Core\Http\Exceptions\HttpNotFoundException;
 use App\Core\Http\HttpErrorService;
 use App\Core\Http\Request;
 use App\Database\PdoService;
 use Auryn\Injector;
-use Exception;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use GeekLab\Conf\Driver\ArrayConfDriver;
 use GeekLab\Conf\GLConf;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+use Throwable;
+
+use UnexpectedValueException;
+
 use function FastRoute\simpleDispatcher;
 
 // Create the Configuration object if it doesn't exist.
 // This allows for "injecting" from the controller tests.
 /**  @var GLConf | null $config */
-if (!$config) {
+if (!isset($config)) {
     $config = new GLConf(
         new ArrayConfDriver(APP_CFG . '/config.php', APP_CFG . '/'),
         [],
         ['keys_lower_case']
     );
+    $config->init();
 }
-$config->init();
+
 // $environment = $config->get('env');
 
 // Create the Request object if it doesn't exist.
 // This allows for "injecting" from the controller tests.
 /** @var Request | null $request */
-if (!$request) {
+if (!isset($request)) {
     $request = new Request(
         query  : $_GET,
         request: $_POST,
@@ -56,7 +59,7 @@ if (!$request) {
 // Create the HttpErrorService object if it doesn't exist.
 // This allows for "injecting" from the controller tests.
 /** @var HttpErrorService | null $errorService */
-if (!$errorService) {
+if (!isset($errorService)) {
     $errorService = new HttpErrorService();
 }
 
@@ -122,11 +125,7 @@ try {
                 // Controller class and method.
                 [$className, $method] = $routeInfo[1];
                 $vars = $routeInfo[2];
-                try {
-                    $class = $injector->make($className);
-                } catch (Exception $e) {
-                    throw new HttpBadRequestException($e->getMessage(), $e);
-                }
+                $class = $injector->make($className);
 
                 // We'll do a middleware the manual way,
                 // instead of the PSR-15 way until I find something better.
@@ -143,18 +142,17 @@ try {
                 $response->setContent($injector->execute($routeInfo[1]));
             } else {
                 // We have something bad here.
-                throw new HttpBadRequestException('Route not callable.');
+                throw new UnexpectedValueException('Invalid type for route handler.');
             }
             break;
 
-        case Dispatcher::NOT_FOUND:
         default:
             throw new HttpNotFoundException();
     }
 
     // Output the response to the viewer.
     $response->send();
-} catch (Exception $e) {
+} catch (Throwable $e) {
     if (!$response) {
         $response = new JsonResponse();
     }

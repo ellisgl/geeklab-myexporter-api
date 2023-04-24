@@ -9,7 +9,10 @@ class DatabaseControllerTest extends ControllerTestCase
 {
     public function testGetDatabases(): void
     {
+        // Inject some override objects.
+        $config = self::$config;
         $request = $this->createRequestObject('127.0.0.1', 'GET', '/databases');
+
         // Change to src directory, so Bootstrap.php can find its includes,
         chdir(APP_ROOT . '/src');
         include(APP_ROOT . '/src/Bootstrap.php');
@@ -23,7 +26,10 @@ class DatabaseControllerTest extends ControllerTestCase
 
     public function testGetTables(): void
     {
+        // Inject some override objects.
+        $config = self::$config;
         $request = $this->createRequestObject('127.0.0.1', 'GET', '/databases/test/tables');
+
         // Change to src directory, so Bootstrap.php can find its includes,
         chdir(APP_ROOT . '/src');
         $this->expectOutputRegex('/\[{"table":"tblA","size":\d+},{"table":"tblB","size":\d+}\]/');
@@ -42,6 +48,8 @@ class DatabaseControllerTest extends ControllerTestCase
         $errorLogTmpFile = tmpFile();
         $errorLogLocationBackup = ini_set('error_log', stream_get_meta_data($errorLogTmpFile)['uri']);
 
+        // Inject some override objects.
+        $config = self::$config;
         $request = $this->createRequestObject('127.0.0.1', 'GET', '/databases/mysql/tables');
         // Change to src directory, so Bootstrap.php can find its includes,
 
@@ -62,6 +70,8 @@ class DatabaseControllerTest extends ControllerTestCase
         $errorLogTmpFile = tmpFile();
         $errorLogLocationBackup = ini_set('error_log', stream_get_meta_data($errorLogTmpFile)['uri']);
 
+        // Inject some override objects.
+        $config = self::$config;
         $request = $this->createRequestObject('127.0.0.1', 'GET', '/databases/TableOfAwesome/tables');
         // Change to src directory, so Bootstrap.php can find its includes,
 

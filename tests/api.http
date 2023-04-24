@@ -32,3 +32,9 @@ Accept: application/json
 GET http://localhost:8000/databases/test/tables
 Authorization: Bearer {{auth_token}}
 Accept: application/json
+
+###
+# @name Bootstrap Router - Anonymous Function Hanlder
+GET http://localhost:8000/hell
+Accept: application/json
+

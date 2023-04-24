@@ -19,7 +19,7 @@ abstract class ControllerTestCase extends TestCase
     {
         if (!self::$config) {
             self::$config = new GLConf(
-                new ArrayConfDriver(APP_CFG . '/config.php', APP_CFG . '/'),
+                new ArrayConfDriver(TEST_CFG . '/config.php', TEST_CFG . '/'),
                 [],
                 ['keys_lower_case']
             );
@@ -33,17 +33,17 @@ abstract class ControllerTestCase extends TestCase
             self::$jwt = JWT::encode(
                 [
                     'iss' => 'localhost',
-                    'aud' => 'myExporter: ' . self::$config->get('servers.1.name'),
+                    'aud' => 'myExporter: ' . self::$config->get('servers.0.name'),
                     'iat' => $iat,
                     'nbf' => $iat,
                     'exp' => $iat + 86400,
                     'hash' => sha1('127.0.0.1'),
                     'data' => [
-                        'host' => 1,
-                        'dbh' => self::$config->get('servers.1.host'),
+                        'host' => 0,
+                        'dbh' => self::$config->get('servers.0.host'),
                         'dbu' => 'root',
                         'dbp' => 'root',
-                        'port' => self::$config->get('servers.1.port') ?: 3306,
+                        'port' => self::$config->get('servers.0.port') ?: 3306,
                     ],
                 ],
                 self::$config->get('jwt.secret_key'),

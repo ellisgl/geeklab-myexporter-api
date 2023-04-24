@@ -29,7 +29,7 @@ class AuthenticationServiceTest extends MockeryTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $confDir = __DIR__ . '/../../_data/conf/';
+        $confDir = __DIR__ . '/../../_data/config/';
         $this->config = new GLConf(new ArrayConfDriver($confDir . 'config.php', $confDir));
         $this->config->init();
     }

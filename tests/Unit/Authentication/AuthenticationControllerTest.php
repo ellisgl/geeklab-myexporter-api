@@ -23,12 +23,15 @@ class AuthenticationControllerTest extends ControllerTestCase
      */
     public function testLogin(): void
     {
+        // Inject some override objects.
+        $config = self::$config;
         $request = $this->createRequestObject(
             '127.0.0.1',
             'POST',
             '/login',
-            json_encode(['server_id' => 1, 'username' => 'root', 'password' => 'root']),
+            json_encode(['server_id' => 0, 'username' => 'root', 'password' => 'root']),
         );
+
         // Change to src directory, so Bootstrap.php can find its includes,
         chdir(APP_ROOT . '/src');
         include(APP_ROOT . '/src/Bootstrap.php');
@@ -47,7 +50,10 @@ class AuthenticationControllerTest extends ControllerTestCase
      */
     public function testLoginWithWrongHttpMethod(): void
     {
+        // Inject some override objects.
+        $config = self::$config;
         $request = $this->createRequestObject('127.0.0.1', 'GET', '/login');
+
         // Change to src directory, so Bootstrap.php can find its includes,
         chdir(APP_ROOT . '/src');
         include(APP_ROOT . '/src/Bootstrap.php');
@@ -66,6 +72,8 @@ class AuthenticationControllerTest extends ControllerTestCase
      */
     public function testLoginWithWrongHttpMethodDirect(): void
     {
+        // Inject some override objects.
+        $config = self::$config;
         $request = $this->createRequestObject('127.0.0.1', 'GET', '/login');
         $authenticationService = new AuthenticationService(self::$config, new PdoService());
         $controller = new AuthenticationController(self::$config, $request, new JsonResponse(),  $authenticationService);
