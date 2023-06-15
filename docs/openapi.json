@@ -11,18 +11,11 @@
                     "auth"
                 ],
                 "summary": "Login with server id, username and password",
-                "description": "Perform login.",
                 "operationId": "authLogin",
                 "requestBody": {
-                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "server_id",
-                                    "username",
-                                    "password"
-                                ],
                                 "properties": {
                                     "server_id": {
                                         "type": "number"
@@ -51,7 +44,8 @@
                                             "example": "success"
                                         },
                                         "jwt": {
-                                            "type": "string"
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODAw"
                                         }
                                     },
                                     "type": "object"
@@ -78,8 +72,8 @@
                                     "type": "array",
                                     "items": {
                                         "properties": {
-                                            "database": {
-                                                "description": "The database name",
+                                            "mysql": {
+                                                "description": "The mysql name",
                                                 "type": "string",
                                                 "example": "DB1"
                                             }
@@ -96,7 +90,7 @@
         "/databases/{database}/tables": {
             "get": {
                 "summary": "Require authentication",
-                "description": "Return a list of tables in a database.",
+                "description": "Return a list of tables in a mysql.",
                 "operationId": "4e41018aeda131108ce22958e475aa20",
                 "responses": {
                     "200": {
@@ -108,14 +102,14 @@
                                     "items": {
                                         "properties": {
                                             "table": {
-                                                "description": "The table name",
+                                                "description": "Table name",
                                                 "type": "string",
                                                 "example": "myTable"
                                             },
                                             "size": {
-                                                "description": "The table size in bytes",
+                                                "description": "Table size in bytes",
                                                 "type": "integer",
-                                                "example": "102452"
+                                                "example": "1024"
                                             }
                                         },
                                         "type": "object"

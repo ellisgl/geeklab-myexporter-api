@@ -2,11 +2,15 @@
 
 namespace Test\Unit;
 
+use App\Core\Http\HttpErrorService;
 use App\Core\Http\Request;
+use Faker\Factory;
+use Faker\Generator;
 use Firebase\JWT\JWT;
 use GeekLab\Conf\Driver\ArrayConfDriver;
 use GeekLab\Conf\GLConf;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 require_once(__DIR__ . '/../../constants.php');
 
@@ -14,6 +18,10 @@ abstract class ControllerTestCase extends TestCase
 {
     protected static ?string $jwt = null;
     protected static ?GLConf $config = null;
+
+    protected ?LoggerInterface $logger = null;
+    protected ?HttpErrorService $httpErrorService = null;
+    protected ?Generator $faker = null;
 
     public static function setUpBeforeClass(): void
     {
@@ -50,6 +58,32 @@ abstract class ControllerTestCase extends TestCase
                 self::$config->get('jwt.alg'),
             );
         }
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->logger = $this
+            ->getMockBuilder(LoggerInterface::class)
+            ->onlyMethods(
+                [
+                    'emergency',
+                    'alert',
+                    'critical',
+                    'error',
+                    'warning',
+                    'notice',
+                    'info',
+                    'debug',
+                    'log',
+                ],
+            )
+            ->getMock();
+        $this->httpErrorService = new HttpErrorService($this->logger);
+
+        // Use the factory to create a Faker\Generator instance.
+        $this->faker = Factory::create();
     }
 
     /**

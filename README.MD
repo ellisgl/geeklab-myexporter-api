@@ -20,7 +20,9 @@ PHP Database Exporter that will have some neat features, because PHPMyAdmin is a
 ## Todo
 * Better README.
 * Full DB exporting.
-* Table exporting.
+* Table & data exporting.
+* Schema exporting.
+* Data only exporting.
 * Email after export.
 * Cloud storage integration.
 * Email notification of completion or error.

@@ -54,10 +54,11 @@ class AuthenticationControllerTest extends ControllerTestCase
         $config = self::$config;
         $request = $this->createRequestObject('127.0.0.1', 'GET', '/login');
 
-        // Change to src directory, so Bootstrap.php can find its includes,
         chdir(APP_ROOT . '/src');
-        include(APP_ROOT . '/src/Bootstrap.php');
+        $errorService = $this->httpErrorService;
+        $this->logger->expects($this->once())->method('error')->with('405 - Method Not Allowed');
 
+        include(APP_ROOT . '/src/Bootstrap.php');
         /** @var Response $response */
         $this->assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $response->getStatusCode());
     }
